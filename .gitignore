@@ -1,0 +1,49 @@
+# === Node / Electron ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === Build output (Electron Forge) ===
+out/
+dist/
+.vite/
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# === IDE ===
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# === Testing ===
+coverage/
+.playwright/
+
+# === Python / uv ===
+__pycache__/
+*.py[cod]
+.venv/
+.uv/
+
+# === Env files ===
+.env
+.env.local
+
+# === Database files (creati dall'utente, non dal repo) ===
+*.hkinv
+*.backup-*.hkinv
+
+# === TypeScript ===
+*.tsbuildinfo
+
+# === Playwright ===
+test-results/
+
+# === Project instructions (opencode) ===
+AGENTS.md
