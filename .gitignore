@@ -47,3 +47,6 @@ test-results/
 
 # === Project instructions (opencode) ===
 AGENTS.md
+
+# === Setup guides ===
+SETUP-GITHUB.md
