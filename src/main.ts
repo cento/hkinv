@@ -2,7 +2,6 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
-import started from 'electron-squirrel-startup';
 import { createDatabase, openDatabase, closeDatabase, getDatabase, isDatabaseOpen, getDbPath } from './database/connection';
 import { runMigrations, getCurrentSchemaVersion } from './database/migrations';
 import * as settingsDb from './database/settings';
@@ -14,7 +13,7 @@ import { validateSettings, validateCustomer, validateInvoice, validateInvoiceIte
 
 let mainWindow: BrowserWindow | null = null;
 
-if (started) {
+if (process.platform === 'win32' && process.argv[1]?.startsWith('--squirrel')) {
   app.quit();
 }
 

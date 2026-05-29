@@ -14,7 +14,9 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      name: 'hkinv',
+    }),
     new MakerZIP({}, ['darwin']),
   ],
   plugins: [
