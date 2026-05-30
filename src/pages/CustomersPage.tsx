@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/dbService';
 import CustomerDialog, { CustomerFormData } from '../components/CustomerDialog';
-import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
+import { EmptyState } from '../components/ConfirmDialog';
 
 export default function CustomersPage() {
   const { t } = useTranslation();
@@ -34,9 +34,9 @@ export default function CustomersPage() {
   const handleSave = async (data: CustomerFormData) => {
     try {
       if (editCustomer) {
-        await api.customersUpdate(editCustomer.id, data as unknown as Record<string, unknown>);
+        await api.customersUpdate(editCustomer.id, data);
       } else {
-        await api.customersCreate(data as unknown as Record<string, unknown>);
+        await api.customersCreate(data);
       }
       setDialogOpen(false);
       setEditCustomer(null);

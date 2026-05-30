@@ -73,7 +73,7 @@ function BackupIndicator() {
         const { downloadBlob } = await import('../database/fsa');
         const fName = getBackupFileName() || `hkinv-backup-${new Date().toISOString().split('T')[0]}.hkinv`;
         downloadBlob(blob, fName);
-      } catch {}
+      } catch { /* Ignored: fallback save attempt */ }
     }
   };
 
@@ -126,7 +126,7 @@ export default function Layout({ children }: LayoutProps) {
     };
     window.addEventListener('hkinv:backup', handler);
     return () => window.removeEventListener('hkinv:backup', handler);
-  }, []);
+  }, [t]);
 
   const menuItems = [
     { text: t('nav.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },

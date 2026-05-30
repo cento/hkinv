@@ -8,6 +8,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useTranslation } from 'react-i18next';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export interface FilterValues {
   dateFrom: string;
   dateTo: string;
@@ -24,13 +25,12 @@ interface Props {
   customers: { id: number; name: string }[];
 }
 
-const defaultFilters: FilterValues = {
+// eslint-disable-next-line react-refresh/only-export-components
+export const defaultFilters: FilterValues = {
   dateFrom: '', dateTo: '', customerId: null,
   status: '', invoiceNumberSearch: '',
   minAmount: '', maxAmount: '',
 };
-
-export { defaultFilters };
 
 export default function InvoiceFilters({ values, onChange, customers }: Props) {
   const { t } = useTranslation();

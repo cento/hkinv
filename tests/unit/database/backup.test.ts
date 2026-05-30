@@ -5,6 +5,7 @@ import type { SqlJsStatic, Database as SqlJsDatabase } from 'sql.js';
 vi.unmock('../../../src/database/opfs');
 vi.unmock('../../../src/database/backup');
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let writeOPFSFile: (name: string, data: ArrayBuffer) => Promise<void>;
 let deleteOPFSFile: (name: string) => Promise<void>;
 let DB_FILENAME: string;
@@ -76,7 +77,7 @@ describe('Backup system', () => {
 
   afterEach(() => {
     stopBackupTimer();
-    try { mockDb?.close(); } catch {}
+    try { mockDb?.close(); } catch { /* Ignored */ }
     localStorage.removeItem(BACKUP_META_KEY);
   });
 

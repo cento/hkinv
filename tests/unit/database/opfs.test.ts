@@ -14,7 +14,7 @@ async function cleanup() {
   try {
     const root = await getTestRoot();
     await root.removeEntry(TEST_FILENAME);
-  } catch {}
+  } catch { /* Ignore: file may not exist */ }
 }
 
 describe('OPFS Storage (real navigator.storage)', () => {

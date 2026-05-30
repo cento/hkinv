@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box, Typography, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel,
@@ -34,11 +34,7 @@ export default function CustomerRatesTable({ customerId }: Props) {
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
-  useEffect(() => {
-    loadData();
-  }, [customerId]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [r, s] = await Promise.all([
@@ -52,7 +48,11 @@ export default function CustomerRatesTable({ customerId }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [customerId]);
+
+  useEffect(() => {
+    loadData();
+  }, [customerId, loadData]);
 
   const handleAdd = async () => {
     if (!selectedService || !customRate) return;

@@ -35,7 +35,8 @@ export default function InvoicesPage() {
 
   const handleBatchStatus = async (status: string) => {
     try {
-      const ids = Array.from(selectedIds.ids);
+      const count = selectedIds.ids.size;
+      const ids = selectedIds.ids;
       setSelectionKey(k => k + 1);
       setSelectedIds({ type: 'include', ids: new Set() });
       for (const id of ids) {
@@ -44,16 +45,16 @@ export default function InvoicesPage() {
           await api.invoicesUpdate(Number(id), { paid_date: new Date().toISOString().split('T')[0] } as any);
         }
       }
-      setSelectedIds({ type: 'include', ids: new Set() });
       await loadInvoices();
-      setToast({ open: true, message: `${ids.length} ${t('invoices.title')} → ${t(`invoices.${status}`)}`, severity: 'success' });
+      setToast({ open: true, message: `${count} ${t('invoices.title')} → ${t(`invoices.${status}`)}`, severity: 'success' });
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
   };
 
   const handleBatchExport = async () => {
-    const ids = Array.from(selectedIds.ids);
+    const count = selectedIds.ids.size;
+    const ids = selectedIds.ids;
     setSelectionKey(k => k + 1);
     setSelectedIds({ type: 'include', ids: new Set() });
     try {
@@ -77,8 +78,7 @@ export default function InvoicesPage() {
         });
         downloadBlob(doc.output('blob'), `${inv.invoice_number}.pdf`);
       }
-      setToast({ open: true, message: `${ids.length} PDF ${t('common.save')} ✓`, severity: 'success' });
-      setSelectedIds({ type: 'include', ids: new Set() });
+      setToast({ open: true, message: `${count} PDF ${t('common.save')} ✓`, severity: 'success' });
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
@@ -212,10 +212,6 @@ export default function InvoicesPage() {
   };
 
   const handleRowDoubleClick = (params: GridRowParams) => {
-    navigate(`/invoices/${params.id}`);
-  };
-
-  const handleRowClick = (params: GridRowParams) => {
     navigate(`/invoices/${params.id}`);
   };
 

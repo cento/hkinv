@@ -34,12 +34,6 @@ export function EmptyState(props: React.HTMLAttributes<HTMLDivElement> & { messa
   );
 }
 
-interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
-  message?: string;
-  actionLabel?: string;
-  onAction?: () => void;
-}
-
 export default function ConfirmDialog({
   open,
   title,

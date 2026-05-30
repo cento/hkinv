@@ -3,11 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Grid, Card, CardContent, Button, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import BackupIcon from '@mui/icons-material/Backup';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PeopleIcon from '@mui/icons-material/People';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import api from '../services/dbService';
+import { EmptyState } from '../components/ConfirmDialog';
+import { useAppContext } from '../contexts/AppContext';
+import { getBackupFileName, isBackupConfigured } from '../database/backup';
 
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color?: string }) {
   return (
@@ -26,6 +31,12 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
 export default function DashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { state } = useAppContext();
+  const archiveName = state.dbPath || '-';
+  const backupName = isBackupConfigured() ? getBackupFileName() : null;
+  const backupMissing = !backupName;
+  const backupSameFile = backupName != null && archiveName !== '-' && backupName === archiveName;
+  const showBackupWarning = backupMissing || backupSameFile;
   const [stats, setStats] = useState<Record<string, number>>({
     totalInvoices: 0,
     totalDraft: 0,
@@ -80,12 +91,44 @@ export default function DashboardPage() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography variant="h5">{t('dashboard.title')}</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/invoices/new')}>
           {t('invoices.new')}
         </Button>
       </Box>
+
+      <Paper variant="outlined" sx={{ p: 1.5, mb: 3, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <ArchiveIcon fontSize="small" color="action" />
+          <Typography variant="body2" color="text.secondary">
+            {t('dashboard.archive')}: <strong>{archiveName}</strong>
+          </Typography>
+        </Box>
+        {backupName && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <BackupIcon fontSize="small" color="success" />
+            <Typography variant="body2" color="text.secondary">
+              {t('dashboard.backup')}: <strong>{backupName}</strong>
+            </Typography>
+          </Box>
+        )}
+      </Paper>
+
+      {showBackupWarning && (
+        <Alert
+          severity="warning"
+          sx={{ mb: 3 }}
+          action={
+            <Button size="small" color="inherit" onClick={() => navigate('/cloud-backup')}>
+              {t('dashboard.configureBackup')}
+            </Button>
+          }
+        >
+          {backupMissing && t('dashboard.backupMissing')}
+          {backupSameFile && t('dashboard.backupSameFile')}
+        </Alert>
+      )}
 
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -110,6 +153,16 @@ export default function DashboardPage() {
           <StatCard icon={<ReceiptLongIcon />} label={t('invoices.paid')} value={stats.totalPaid} color="success.main" />
         </Grid>
       </Grid>
+
+      {!loading && stats.totalInvoices === 0 && (
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <EmptyState
+            message={t('dashboard.emptyMessage') || 'No invoices yet. Create your first invoice to get started!'}
+            actionLabel={t('invoices.new')}
+            onAction={() => navigate('/invoices/new')}
+          />
+        </Paper>
+      )}
 
       {overdueInvoices.length > 0 && (
         <Alert severity="warning" icon={<WarningAmberIcon />} sx={{ mb: 3 }}

@@ -14,7 +14,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import api from '../services/dbService';
 import InvoiceItemsTable, { InvoiceItemRow } from '../components/InvoiceItemsTable';
 import { formatDateISO, calculateDueDate } from '../utils/format';
-import { validateInvoice } from '../utils/validators';
+import { validateInvoice, validateInvoiceItem } from '../utils/validators';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PDFPreviewDialog from '../components/PDFPreviewDialog';
 import { downloadBlob } from '../database/fsa';
@@ -36,7 +36,7 @@ export default function InvoiceEditPage() {
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [issueDate, setIssueDate] = useState<string>(formatDateISO(new Date().toISOString()));
   const [dueDate, setDueDate] = useState<string>('');
-  const [status, setStatus] = useState<string>('draft');
+  const [status, setStatus] = useState<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [paymentTerms, setPaymentTerms] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
@@ -47,7 +47,7 @@ export default function InvoiceEditPage() {
   const [discardDialog, setDiscardDialog] = useState(false);
   const [reviewDialog, setReviewDialog] = useState(false);
   const [previewPdfData, setPreviewPdfData] = useState<string | null>(null);
-  const [pendingSaveStatus, setPendingSaveStatus] = useState<string>('draft');
+  const [pendingSaveStatus, setPendingSaveStatus] = useState<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
   const [templateReady, setTemplateReady] = useState(false);
   const [dataReady, setDataReady] = useState(false);
   const initialFormRef = useRef<{ customerId: number | null; issueDate: string; dueDate: string; status: string; discountPercent: number; paymentTerms: string; notes: string; items: InvoiceItemRow[] } | null>(null);
@@ -73,7 +73,7 @@ export default function InvoiceEditPage() {
         setInvoiceNumber(invNum as string);
       }
     }).catch(console.error).finally(() => setLoading(false));
-  }, []);
+  }, [isNew]);
 
   // Load existing invoice for editing
   useEffect(() => {
@@ -143,6 +143,7 @@ export default function InvoiceEditPage() {
       notes,
       items: [...items],
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customers.length, existingInvoice, isNew, dataReady, templateReady]);
 
   // beforeunload for window close / reload
@@ -189,14 +190,14 @@ export default function InvoiceEditPage() {
     }
   }, [isNew, customers, settings, loadTemplate]);
 
-  const handleSave = async (finalStatus: string) => {
+  const handleSave = async (finalStatus: 'draft' | 'sent' | 'paid' | 'cancelled') => {
     // Fallback: se issue_date o due_date sono vuote, usa oggi
     const safeIssueDate = issueDate || formatDateISO(new Date().toISOString());
     const safeDueDate = dueDate || calculateDueDate(settings?.default_payment_terms);
     const data = {
       issue_date: safeIssueDate,
       due_date: safeDueDate,
-      customer_id: customerId,
+      customer_id: customerId!,
       discount_percent: discountPercent,
       notes: notes || null,
       payment_terms: paymentTerms || null,
@@ -210,6 +211,23 @@ export default function InvoiceEditPage() {
       };
       const msg = validation.errors.map(e => `• ${fieldLabels[e.field] || e.field}: ${t(e.message)}`).join('\n');
       setToast({ open: true, message: msg, severity: 'error' });
+      return;
+    }
+
+    // Validate invoice items
+    if (items.length === 0) {
+      setToast({ open: true, message: t('validation.atLeastOneItem') || 'At least one item is required', severity: 'error' });
+      return;
+    }
+    const itemErrors: string[] = [];
+    for (const item of items) {
+      const itemValidation = validateInvoiceItem(item);
+      if (!itemValidation.valid) {
+        itemErrors.push(...itemValidation.errors.map(e => `• ${t('invoices.items')} #${item.tempId}: ${t(e.message)}`));
+      }
+    }
+    if (itemErrors.length > 0) {
+      setToast({ open: true, message: itemErrors.join('\n'), severity: 'error' });
       return;
     }
 
@@ -229,16 +247,15 @@ export default function InvoiceEditPage() {
 
       if (existingInvoice) {
         // Update existing
-        const updateData: Record<string, unknown> = { ...data, status: finalStatus };
-        if (invoiceNumber.trim() && invoiceNumber.trim() !== existingInvoice.invoice_number) {
-          updateData.invoice_number = invoiceNumber.trim();
-        }
-        if (finalStatus === 'paid') {
-          updateData.paid_date = new Date().toISOString().split('T')[0];
-        } else if (existingInvoice.status === 'paid' && finalStatus !== 'paid') {
-          updateData.paid_date = null;
-        }
-        await api.invoicesUpdate(existingInvoice.id, updateData);
+        const paidDate = finalStatus === 'paid'
+          ? new Date().toISOString().split('T')[0]
+          : (existingInvoice.status === 'paid' ? null : undefined);
+        await api.invoicesUpdate(existingInvoice.id, {
+          ...data,
+          status: finalStatus,
+          invoice_number: invoiceNumber.trim() && invoiceNumber.trim() !== existingInvoice.invoice_number ? invoiceNumber.trim() : undefined,
+          ...(paidDate !== undefined ? { paid_date: paidDate } : {}),
+        });
 
         // Sync items: delete removed, update existing, add new
         const existingIds = (await api.invoiceItemsGetAll(existingInvoice.id)).map((i: any) => i.id);
@@ -272,16 +289,14 @@ export default function InvoiceEditPage() {
         await api.invoicesRecalculateTotals(existingInvoice.id);
       } else {
         // Create new — lascia che sia il backend a generare il numero atomicamente
-        const createData: Record<string, unknown> = {
+        const paidDate = finalStatus === 'paid' ? new Date().toISOString().split('T')[0] : undefined;
+        const newId: number = await api.invoicesCreate({
           ...data,
           invoice_number: invoiceNumber || undefined,
           status: finalStatus,
           currency: 'HKD',
-        };
-        if (finalStatus === 'paid') {
-          createData.paid_date = new Date().toISOString().split('T')[0];
-        }
-        const newId: number = await api.invoicesCreate(createData);
+          ...(paidDate ? { paid_date: paidDate } : {}),
+        });
 
         for (const item of items) {
           await api.invoiceItemsAdd(newId, {
@@ -419,7 +434,7 @@ export default function InvoiceEditPage() {
       const newId: number = await api.invoicesCreate({
         issue_date: formatDateISO(new Date().toISOString()),
         due_date: dueDate,
-        customer_id: customerId,
+        customer_id: customerId!,
         status: 'draft',
         currency: 'HKD',
         invoice_number: invoiceNum,

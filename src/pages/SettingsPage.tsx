@@ -7,7 +7,7 @@ import api from '../services/dbService';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
-  const { setSettingsComplete, setLanguage } = useAppContext();
+  const { setSettingsComplete } = useAppContext();
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });

@@ -35,7 +35,7 @@ export async function deleteOPFSFile(name: string): Promise<void> {
   try {
     const root = await getRoot();
     await root.removeEntry(name);
-  } catch {}
+  } catch { /* Ignore: file may not exist */ }
 }
 
 export async function hasOPFSFile(name: string): Promise<boolean> {

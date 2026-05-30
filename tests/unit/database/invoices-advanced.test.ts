@@ -1,19 +1,12 @@
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
-import initSqlJs from 'sql.js';
-import { Database as SqlJsDatabase } from 'sql.js';
+import initSqlJs, { Database as SqlJsDatabase } from 'sql.js';
 import { runMigrations } from '../../../src/database/migrations';
 import * as invoicesDb from '../../../src/database/invoices';
 import * as customersDb from '../../../src/database/customers';
-import * as settingsDb from '../../../src/database/settings';
-
 let db: SqlJsDatabase;
 let SQL: any;
 let cid: number;
 
-function q(sql: string, params?: any[]) {
-  const stmt = db.prepare(sql); if (params) stmt.bind(params);
-  const r = stmt.step() ? stmt.getAsObject() : null; stmt.free(); return r || undefined;
-}
 function e(sql: string, params?: any[]) {
   if (params) { params = params.map((v: any) => (typeof v === 'number' && isNaN(v)) ? 0 : (v === undefined ? null : v)); const stmt = db.prepare(sql); stmt.bind(params); stmt.step(); stmt.free(); } else db.run(sql);
 }
@@ -120,7 +113,6 @@ describe('invoice items edge cases', () => {
 
   it('should recalculate totals correctly with discount', () => {
     invoicesDb.addInvoiceItem(invId, { description: 'Lesson', hours: 2, rate: 500 }, db);
-    const inv = invoicesDb.getInvoiceById(invId, db);
     invoicesDb.updateInvoice(invId, { discount_percent: 10 }, db);
     invoicesDb.recalculateInvoiceTotals(invId, db);
     const updated = invoicesDb.getInvoiceById(invId, db);

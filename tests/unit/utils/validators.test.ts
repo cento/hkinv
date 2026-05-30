@@ -4,7 +4,6 @@ import {
   validateCustomer,
   validateInvoice,
   validateInvoiceItem,
-  validateServiceType,
 } from '../../../src/utils/validators';
 
 describe('validateSettings', () => {

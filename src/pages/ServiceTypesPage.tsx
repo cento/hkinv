@@ -33,9 +33,9 @@ export default function ServiceTypesPage() {
   const handleSave = async (data: ServiceTypeFormData) => {
     try {
       if (editService) {
-        await api.serviceTypesUpdate(editService.id, data as unknown as Record<string, unknown>);
+        await api.serviceTypesUpdate(editService.id, data);
       } else {
-        await api.serviceTypesCreate(data as unknown as Record<string, unknown>);
+        await api.serviceTypesCreate(data);
       }
       setDialogOpen(false);
       setEditService(null);

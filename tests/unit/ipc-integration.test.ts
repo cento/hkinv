@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import initSqlJs from 'sql.js';
-import { Database as SqlJsDatabase } from 'sql.js';
 import { runMigrations } from '../../src/database/migrations';
 import * as settingsDb from '../../src/database/settings';
 import * as customersDb from '../../src/database/customers';
@@ -14,10 +13,6 @@ let db, SQL;
 function q(sql, params) {
   const stmt = db.prepare(sql); if (params) stmt.bind(params);
   const r = stmt.step() ? stmt.getAsObject() : null; stmt.free(); return r || undefined;
-}
-function qa(sql, params) {
-  const stmt = db.prepare(sql); if (params) stmt.bind(params);
-  const rows = []; while (stmt.step()) rows.push(stmt.getAsObject()); stmt.free(); return rows;
 }
 function e(sql, params) {
   if (params) { params = params.map(v => (typeof v === 'number' && isNaN(v)) ? 0 : (v === undefined ? null : v)); const stmt = db.prepare(sql); stmt.bind(params); stmt.step(); stmt.free(); } else db.run(sql);
