@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import React, { useState } from 'react';
+import React from 'react';
 import ErrorBoundary from '../../../src/components/ErrorBoundary';
 
 // Suppress console.error for intentional crash
