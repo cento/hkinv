@@ -190,7 +190,7 @@
   "nav.settings": "Impostazioni",
   "nav.dashboard": "Dashboard",
   "nav.taxReports": "Report Fiscali",
-  "nav.cloudBackup": "Backup Cloud",
+  "nav.cloudBackup": "Backup",
 
   "pdf.taxReport": "Report Fiscale",
   "pdf.period": "Periodo",
@@ -215,18 +215,18 @@
 
   "wizard.paymentTermsHelp": "Es. \"30 giorni\", \"Fine mese\", \"A ricevimento fattura\"",
 
-  "cloudBackup.title": "Backup Cloud",
-  "cloudBackup.googleDrive": "Google Drive",
-  "cloudBackup.howTo": "Come eseguire il backup su Google Drive",
-  "cloudBackup.howToDesc": "Clicca \"Salva su Drive\" qui sotto, poi scegli \"Google Drive\" dal selettore file. Il database verrà salvato come file .hkinv.",
+  "cloudBackup.title": "Backup e Sync",
+  "cloudBackup.backupFile": "File di backup",
+  "cloudBackup.howTo": "Come funziona",
+  "cloudBackup.howToDesc": "Scegli dove salvare il file di backup. L'app salva automaticamente ogni 5 minuti. Se salvi in una cartella sincronizzata (Google Drive, OneDrive, Dropbox), il file si sincronizza automaticamente sul cloud.",
   "cloudBackup.autoBackup": "Backup automatico",
   "cloudBackup.configuredTo": "Backup su: {name}",
   "cloudBackup.notConfigured": "Non configurato",
   "cloudBackup.lastBackup": "Ultimo backup",
   "cloudBackup.changeLocation": "Cambia posizione",
   "cloudBackup.setupBackup": "Configura backup",
-  "cloudBackup.saveToDrive": "Salva su Drive",
+  "cloudBackup.saveToDrive": "Esporta backup",
   "cloudBackup.remove": "Rimuovi backup",
   "cloudBackup.removed": "Posizione backup rimossa",
-  "cloudBackup.driveNote": "Suggerimento: Se hai Google Drive per Desktop installato, appare come cartella nel selettore file di Windows. Salva il file .hkinv lì e verrà sincronizzato automaticamente."
+  "cloudBackup.driveNote": "Suggerimento: salva il file .hkinv in una cartella Google Drive, OneDrive o Dropbox e si sincronizzera' automaticamente sul cloud, tenendo i tuoi dati al sicuro."
 }

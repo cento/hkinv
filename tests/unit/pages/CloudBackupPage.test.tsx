@@ -37,7 +37,7 @@ describe('CloudBackupPage', () => {
   it('renders title and cloud backup section', async () => {
     renderPage();
     await waitFor(() => expect(screen.getByText('cloudBackup.title')).toBeInTheDocument(), { timeout: 5000 });
-    expect(screen.getByText('cloudBackup.googleDrive')).toBeInTheDocument();
+    expect(screen.getByText('cloudBackup.backupFile')).toBeInTheDocument();
   });
 
   it('shows backup status', async () => {

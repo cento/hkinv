@@ -4,8 +4,8 @@ import {
   Box, Typography, Button, Paper, List, ListItem,
   ListItemIcon, ListItemText, Divider,
 } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoIcon from '@mui/icons-material/Info';
 import { configureBackupLocation, getStoredBackupFileName, clearStoredBackupHandle, supportsFSA, saveHKINVFile, downloadBlob } from '../database/fsa';
@@ -60,7 +60,7 @@ export default function CloudBackupPage() {
       <Typography variant="h5" sx={{ mb: 3 }}>{t('cloudBackup.title') || 'Cloud Backup'}</Typography>
 
       <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>{t('cloudBackup.googleDrive') || 'Google Drive'}</Typography>
+        <Typography variant="h6" sx={{ mb: 2 }}>{t('cloudBackup.backupFile') || 'Backup file'}</Typography>
         <List dense>
           <ListItem>
             <ListItemIcon><InfoIcon fontSize="small" /></ListItemIcon>
@@ -74,7 +74,7 @@ export default function CloudBackupPage() {
             <ListItemText
               primary={t('cloudBackup.autoBackup') || 'Automatic backup'}
               secondary={configured
-                ? (t('cloudBackup.configuredTo') || `Backing up to: ${backupName || 'configured'}`)
+                ? t('cloudBackup.configuredTo', { name: backupName || '' })
                 : (t('cloudBackup.notConfigured') || 'Not configured')}
             />
           </ListItem>
@@ -92,10 +92,10 @@ export default function CloudBackupPage() {
         <Divider sx={{ my: 2 }} />
 
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Button variant="contained" startIcon={<CloudUploadIcon />} onClick={handleSetup}>
+          <Button variant="contained" startIcon={<FolderOpenIcon />} onClick={handleSetup}>
             {configured ? (t('cloudBackup.changeLocation') || 'Change location') : (t('cloudBackup.setupBackup') || 'Set up backup')}
           </Button>
-          <Button variant="outlined" startIcon={<CloudDownloadIcon />} onClick={handleExportForCloud}>
+          <Button variant="outlined" startIcon={<SaveAltIcon />} onClick={handleExportForCloud}>
             {t('cloudBackup.saveToDrive') || 'Save to Drive'}
           </Button>
           {configured && (
