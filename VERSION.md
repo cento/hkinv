@@ -14,6 +14,7 @@
 - **Form detects real changes only**: creating a new invoice from template doesn't falsely show "unsaved changes"
 - **Settings Save button is visible**: the icon-only button now has a "Save" label
 - **Full bilingual support**: all UI strings use translations (Italian/English)
+- **CSP no longer blocks sql.js**: added `'unsafe-eval'` to Content-Security-Policy — required by WebAssembly
 
 ### Improved Performance
 - **Faster page loads**: code is split into separate chunks (React, MUI, PDF) — only what you need loads
