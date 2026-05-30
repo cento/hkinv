@@ -25,6 +25,7 @@
   "common.print": "Print",
   "common.review": "Review",
   "common.confirmSave": "Confirm & Save",
+  "common.preview": "Preview",
   "invoices.noInvoices": "No invoices found. Create your first invoice!",
   "customers.noCustomers": "No customers found. Add your first customer!",
   "serviceTypes.noServices": "No payment profiles found. Create a new one!",

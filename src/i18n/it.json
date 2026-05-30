@@ -25,6 +25,7 @@
   "common.print": "Stampa",
   "common.review": "Riepilogo",
   "common.confirmSave": "Conferma e salva",
+  "common.preview": "Anteprima",
   "invoices.noInvoices": "Nessuna fattura trovata. Creane una nuova per iniziare!",
   "customers.noCustomers": "Nessun cliente trovato. Aggiungi il primo cliente!",
   "serviceTypes.noServices": "Nessun profilo di pagamento trovato. Creane uno nuovo!",

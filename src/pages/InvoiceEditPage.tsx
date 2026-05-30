@@ -16,6 +16,7 @@ import InvoiceItemsTable, { InvoiceItemRow } from '../components/InvoiceItemsTab
 import { formatDateISO, calculateDueDate } from '../utils/format';
 import { validateInvoice } from '../utils/validators';
 import ConfirmDialog from '../components/ConfirmDialog';
+import PDFPreviewDialog from '../components/PDFPreviewDialog';
 import { downloadBlob } from '../database/fsa';
 
 export default function InvoiceEditPage() {
@@ -45,6 +46,7 @@ export default function InvoiceEditPage() {
   const [existingInvoice, setExistingInvoice] = useState<Record<string, any> | null>(null);
   const [discardDialog, setDiscardDialog] = useState(false);
   const [reviewDialog, setReviewDialog] = useState(false);
+  const [previewPdfData, setPreviewPdfData] = useState<string | null>(null);
   const [pendingSaveStatus, setPendingSaveStatus] = useState<string>('draft');
   const [templateReady, setTemplateReady] = useState(false);
   const [dataReady, setDataReady] = useState(false);
@@ -298,7 +300,7 @@ export default function InvoiceEditPage() {
     }
   };
 
-  const handleExportPDF = async () => {
+  const handleExportPDF = async (download = true) => {
     if (!existingInvoice && !invoiceId) return;
     try {
       const inv = (existingInvoice || await api.invoicesGetById(invoiceId!)) as Record<string, any> | null;
@@ -337,9 +339,13 @@ export default function InvoiceEditPage() {
         language: (localStorage.getItem('app-language') || 'it') as 'it' | 'en',
       });
 
-      const blob = doc.output('blob');
-      downloadBlob(blob, `${inv.invoice_number}.pdf`);
-      setToast({ open: true, message: 'PDF ' + t('common.save') + ' ✓', severity: 'success' });
+      if (download) {
+        const blob = doc.output('blob');
+        downloadBlob(blob, `${inv.invoice_number}.pdf`);
+        setToast({ open: true, message: 'PDF ' + t('common.save') + ' ✓', severity: 'success' });
+      } else {
+        setPreviewPdfData(doc.output('datauristring'));
+      }
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
@@ -460,7 +466,10 @@ export default function InvoiceEditPage() {
             <Button startIcon={<ContentCopyIcon />} onClick={handleDuplicate}>
               {t('common.duplicate')}
             </Button>
-            <Button startIcon={<PictureAsPdfIcon />} onClick={handleExportPDF}>
+            <Button startIcon={<PictureAsPdfIcon />} onClick={() => handleExportPDF(false)}>
+              {t('common.preview')}
+            </Button>
+            <Button startIcon={<PictureAsPdfIcon />} onClick={() => handleExportPDF(true)}>
               {t('invoices.exportPdf')}
             </Button>
           </>
@@ -639,6 +648,13 @@ export default function InvoiceEditPage() {
         onClose={() => setToast(t => ({ ...t, open: false }))}>
         <Alert severity={toast.severity} variant="filled">{toast.message}</Alert>
       </Snackbar>
+
+      <PDFPreviewDialog
+        open={!!previewPdfData}
+        onClose={() => setPreviewPdfData(null)}
+        pdfData={previewPdfData}
+        fileName={existingInvoice ? `${existingInvoice.invoice_number}.pdf` : 'invoice.pdf'}
+      />
     </Box>
   );
 }
