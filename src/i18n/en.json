@@ -199,6 +199,8 @@
   "pdf.quarterly": "Quarterly",
 
   "dashboard.title": "Dashboard",
+  "dashboard.archive": "Archive",
+  "dashboard.backup": "Backup",
   "dashboard.totalInvoices": "Total invoices",
   "dashboard.monthlyTotal": "Total revenue",
   "dashboard.customers": "Customers",

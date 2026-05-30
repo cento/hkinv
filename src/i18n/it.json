@@ -199,6 +199,8 @@
   "pdf.quarterly": "Trimestrale",
 
   "dashboard.title": "Dashboard",
+  "dashboard.archive": "Archivio",
+  "dashboard.backup": "Backup",
   "dashboard.totalInvoices": "Totale fatture",
   "dashboard.monthlyTotal": "Totale imponibile",
   "dashboard.customers": "Clienti",
