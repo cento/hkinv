@@ -36,7 +36,7 @@
 
   "welcome.lastOpened": "Ultimo archivio aperto",
   "welcome.createNew": "Crea un nuovo archivio fatture per iniziare",
-  "welcome.continueWith": "Continua con {archive}",
+  "welcome.continueWith": "Continua con",
   "welcome.continueExisting": "Continua con archivio esistente",
   "welcome.setBackup": "Imposta posizione backup",
   "welcome.backupConfigured": "Posizione backup configurata ✓",

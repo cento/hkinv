@@ -50,6 +50,7 @@ export default function InvoiceEditPage() {
   const [dataReady, setDataReady] = useState(false);
   const initialFormRef = useRef<{ customerId: number | null; issueDate: string; dueDate: string; status: string; discountPercent: number; paymentTerms: string; notes: string; items: InvoiceItemRow[] } | null>(null);
   const dataReadyRef = useRef(false);
+  const invoiceNumberEdited = useRef(false);
 
   // Load data
   useEffect(() => {
@@ -63,7 +64,11 @@ export default function InvoiceEditPage() {
       }
     }).catch(console.error);
     if (isNew) {
-      api.settingsGenerateInvoiceNumber().then(setInvoiceNumber).catch(console.error);
+      api.settingsGenerateInvoiceNumber().then(num => {
+        if (!invoiceNumberEdited.current) {
+          setInvoiceNumber(num);
+        }
+      }).catch(console.error);
     }
   }, []);
 
@@ -470,7 +475,7 @@ export default function InvoiceEditPage() {
               fullWidth
               label={t('invoices.number')}
               value={invoiceNumber || ''}
-              onChange={e => { setInvoiceNumber(e.target.value); setInvoiceNumberError(''); }}
+              onChange={e => { setInvoiceNumber(e.target.value); setInvoiceNumberError(''); invoiceNumberEdited.current = true; }}
               size="small"
               sx={{ mb: 2 }}
               error={!!invoiceNumberError}
