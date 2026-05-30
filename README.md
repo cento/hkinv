@@ -47,10 +47,31 @@ Invoice management for freelance teachers in Hong Kong. Browser-based web app to
 
 ### Data Storage & Backup
 - Primary storage: **OPFS** (Origin Private File System) in your browser
-- Optional backup: save a `.hkinv` file to your Documents folder
+- **Backup & Sync**: choose a backup file location (local folder, Google Drive, OneDrive, Dropbox)
 - **Auto-backup every 5 minutes** to your backup file (when configured)
+- Dashboard shows archive name and backup name at a glance
+- **Backup warnings**: alerts if no backup is configured or if backup is the same file as the archive
 - Manual save button always available in the toolbar
 - Open any `.hkinv` file to import it into the browser
+
+### Tax Reports
+- Hong Kong tax year view (Apr–Mar) with annual and quarterly breakdown
+- Revenue per customer with invoice-level detail
+- CSV and PDF export with teacher info
+
+### Dashboard
+- Financial summary: total invoices, revenue, customer count
+- Status breakdown: draft, sent, paid
+- **Overdue invoice alerts** with quick navigation
+- **Archive & backup info** with warnings when backup is missing or unsafe
+- **Empty state** with CTA when no invoices exist yet
+
+### Batch Operations
+- Select multiple invoices and mark as sent/paid in bulk
+- Batch PDF export for selected invoices
+
+### Onboarding
+- **3-step guided wizard** after creating a new archive: teacher info → first customer → first invoice
 
 ### Dark Mode
 - Toggle light/dark theme from the sidebar
@@ -76,7 +97,7 @@ Invoice management for freelance teachers in Hong Kong. Browser-based web app to
 | i18n | react-i18next + i18next |
 | Routing | react-router-dom v7 (HashRouter) |
 | Build | Vite 6 |
-| Tests | Vitest (196 unit tests) |
+| Tests | Vitest (327 unit tests) |
 
 ## Quick Start (Windows)
 
@@ -119,10 +140,10 @@ The app opens in your browser at `http://localhost:5173`.
 
 1. Open the app (see Quick Start above)
 2. Click **"Create new archive"** to start fresh
-3. Fill in the teacher profile
-4. Start adding customers and invoices
+3. An **onboarding wizard** will guide you through: teacher profile → first customer → first invoice
+4. Start invoicing!
 
-Already have a `.hkinv` file? Use **"Open archive"** to import it. You can optionally set a **backup location** to keep a copy in your Documents folder.
+Already have a `.hkinv` file? Use **"Open archive"** to import it. Go to **Backup** in the sidebar to set up automatic backups to a cloud-synced folder.
 
 ## Data Portability
 
