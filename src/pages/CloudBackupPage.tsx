@@ -8,7 +8,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoIcon from '@mui/icons-material/Info';
-import { configureBackupLocation, getStoredBackupFileName, clearStoredBackupHandle } from '../database/fsa';
+import { configureBackupLocation, getStoredBackupFileName, clearStoredBackupHandle, supportsFSA, saveHKINVFile } from '../database/fsa';
 import { getDatabase } from '../database/connection';
 import { getLastBackupTime, isBackupConfigured } from '../database/backup';
 import { downloadBlob } from '../database/fsa';
@@ -35,13 +35,22 @@ export default function CloudBackupPage() {
     }
   };
 
-  const handleExportForCloud = () => {
+  const handleExportForCloud = async () => {
     try {
       const db = getDatabase();
       const data = new Uint8Array(db.export());
+      const suggestedName = backupName || `hkinv-backup-${new Date().toISOString().split('T')[0]}.hkinv`;
+
+      if (supportsFSA()) {
+        const handle = await saveHKINVFile(data.buffer, suggestedName);
+        if (handle) {
+          setToast({ open: true, message: t('common.save') + ' ✓', severity: 'success' });
+          return;
+        }
+      }
+
       const blob = new Blob([data], { type: 'application/octet-stream' });
-      const fileName = backupName || `hkinv-backup-${new Date().toISOString().split('T')[0]}.hkinv`;
-      downloadBlob(blob, fileName);
+      downloadBlob(blob, suggestedName);
       setToast({ open: true, message: t('common.save') + ' ✓', severity: 'success' });
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
