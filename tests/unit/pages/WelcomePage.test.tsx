@@ -64,8 +64,8 @@ describe('WelcomePage', () => {
 
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText(/Continue with existing archive/)).toBeInTheDocument();
-      expect(screen.getByText(/Set backup location/)).toBeInTheDocument();
+      expect(screen.getByText(/welcome\.continueExisting/)).toBeInTheDocument();
+      expect(screen.getByText(/welcome\.setBackup/)).toBeInTheDocument();
     });
 
     vi.mocked(hasExistingDB).mockResolvedValue(false);
@@ -79,7 +79,7 @@ describe('WelcomePage', () => {
       expect(screen.getByText('app.title')).toBeInTheDocument();
     });
 
-    expect(screen.queryByText(/Continue with existing archive/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Set backup location/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/welcome\.continueExisting/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/welcome\.setBackup/)).not.toBeInTheDocument();
   });
 });

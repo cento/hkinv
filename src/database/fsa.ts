@@ -97,7 +97,21 @@ export async function openHKINVFile(): Promise<{ data: ArrayBuffer; handle: File
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.hkinv';
+    let cleanedUp = false;
+    function cleanup() {
+      if (cleanedUp) return;
+      cleanedUp = true;
+      window.removeEventListener('focus', onFocus);
+    }
+    function onFocus() {
+      setTimeout(() => {
+        cleanup();
+        resolve(null);
+      }, 500);
+    }
+    window.addEventListener('focus', onFocus);
     input.onchange = async () => {
+      cleanup();
       const file = input.files?.[0];
       if (file) {
         resolve({ data: await file.arrayBuffer(), handle: null });

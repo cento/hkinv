@@ -45,7 +45,10 @@ export default function InvoiceEditPage() {
   const [discardDialog, setDiscardDialog] = useState(false);
   const [reviewDialog, setReviewDialog] = useState(false);
   const [pendingSaveStatus, setPendingSaveStatus] = useState<string>('draft');
+  const [templateReady, setTemplateReady] = useState(false);
+  const [dataReady, setDataReady] = useState(false);
   const initialFormRef = useRef<{ customerId: number | null; issueDate: string; dueDate: string; status: string; discountPercent: number; paymentTerms: string; notes: string; items: InvoiceItemRow[] } | null>(null);
+  const dataReadyRef = useRef(false);
 
   // Load data
   useEffect(() => {
@@ -80,7 +83,7 @@ export default function InvoiceEditPage() {
         setPaymentTerms(inv.payment_terms || '');
         setNotes(inv.notes || '');
         const invItems = await api.invoiceItemsGetAll(invoiceId);
-        setItems((invItems as any[]).map((item: any, i: number) => ({
+        const loadedItems = (invItems as any[]).map((item: any, i: number) => ({
           tempId: i + 1,
           id: item.id,
           description: item.description,
@@ -88,7 +91,10 @@ export default function InvoiceEditPage() {
           hours: item.hours,
           rate: item.rate,
           amount: item.amount,
-        })));
+        }));
+        setItems(loadedItems);
+        dataReadyRef.current = true;
+        setDataReady(true);
       } catch (err) {
         console.error(err);
       }
@@ -111,21 +117,21 @@ export default function InvoiceEditPage() {
 
   // Capture initial form snapshot after data loads
   useEffect(() => {
-    if (customers.length > 0 && (existingInvoice || isNew)) {
-      if (initialFormRef.current === null) {
-        initialFormRef.current = {
-          customerId,
-          issueDate,
-          dueDate,
-          status,
-          discountPercent,
-          paymentTerms,
-          notes,
-          items: [...items],
-        };
-      }
-    }
-  }, [customers.length, existingInvoice, isNew]);
+    if (initialFormRef.current !== null) return;
+    if (existingInvoice && !dataReady) return;
+    if (isNew && !templateReady) return;
+    if (customers.length === 0) return;
+    initialFormRef.current = {
+      customerId,
+      issueDate,
+      dueDate,
+      status,
+      discountPercent,
+      paymentTerms,
+      notes,
+      items: [...items],
+    };
+  }, [customers.length, existingInvoice, isNew, dataReady, templateReady]);
 
   // beforeunload for window close / reload
   useEffect(() => {
@@ -147,18 +153,21 @@ export default function InvoiceEditPage() {
         setCustomerId(last.customer_id);
         const lastItems = (await api.invoiceItemsGetAll(last.id)) as Record<string, any>[];
         if (lastItems && lastItems.length > 0) {
-          setItems(lastItems.map((item: any, i: number) => ({
+          const templateItems = lastItems.map((item: any, i: number) => ({
             tempId: i + 1,
             description: item.description,
             lesson_date: item.lesson_date || '',
             hours: item.hours,
             rate: 0, // Don't copy amounts
             amount: 0,
-          })));
+          }));
+          setItems(templateItems);
         }
       }
     } catch (err) {
       console.error('Template load error:', err);
+    } finally {
+      setTemplateReady(true);
     }
   }, [isNew]);
 
@@ -197,7 +206,13 @@ export default function InvoiceEditPage() {
 
       if (existingInvoice) {
         // Update existing
-        await api.invoicesUpdate(existingInvoice.id, { ...data, status: finalStatus });
+        const updateData: Record<string, unknown> = { ...data, status: finalStatus };
+        if (finalStatus === 'paid') {
+          updateData.paid_date = new Date().toISOString().split('T')[0];
+        } else if (existingInvoice.status === 'paid' && finalStatus !== 'paid') {
+          updateData.paid_date = null;
+        }
+        await api.invoicesUpdate(existingInvoice.id, updateData);
 
         // Sync items: delete removed, update existing, add new
         const existingIds = (await api.invoiceItemsGetAll(existingInvoice.id)).map((i: any) => i.id);
@@ -231,11 +246,16 @@ export default function InvoiceEditPage() {
         await api.invoicesRecalculateTotals(existingInvoice.id);
       } else {
         // Create new — lascia che sia il backend a generare il numero atomicamente
-        const newId: number = await api.invoicesCreate({
+        const createData: Record<string, unknown> = {
           ...data,
+          invoice_number: invoiceNumber || undefined,
           status: finalStatus,
           currency: 'HKD',
-        });
+        };
+        if (finalStatus === 'paid') {
+          createData.paid_date = new Date().toISOString().split('T')[0];
+        }
+        const newId: number = await api.invoicesCreate(createData);
 
         for (const item of items) {
           await api.invoiceItemsAdd(newId, {

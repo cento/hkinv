@@ -112,6 +112,7 @@ export default function SettingsPage() {
       
 
       <Button variant="contained" size="large" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving || !form.teacher_name || !form.teacher_address}>
+        {t('common.save')}
       </Button>
 
       <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast(t => ({ ...t, open: false }))}>

@@ -98,9 +98,13 @@ const MIGRATIONS: Record<number, string[]> = {
 function queryOne(db: SqlJsDatabase, sql: string, params?: any[]): Record<string, any> | undefined {
   const stmt = db.prepare(sql);
   if (params) stmt.bind(params);
-  const result: Record<string, any> | undefined = stmt.getAsObject();
+  if (!stmt.step()) {
+    stmt.free();
+    return undefined;
+  }
+  const result = stmt.getAsObject();
   stmt.free();
-  return result && Object.keys(result).length > 0 ? result : undefined;
+  return result;
 }
 
 function queryAll(db: SqlJsDatabase, sql: string, params?: any[]): Record<string, any>[] {

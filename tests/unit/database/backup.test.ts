@@ -27,6 +27,8 @@ vi.mock('../../../src/database/connection', async (importOriginal) => {
   };
 });
 
+const BACKUP_META_KEY = 'hkinv-backup-meta';
+
 describe('Backup system', () => {
   let backupEvents: { success: boolean; manual: boolean }[] = [];
 
@@ -47,6 +49,17 @@ describe('Backup system', () => {
     await deleteOPFSFile(DB_FILENAME);
     mockDb = new SQL.Database();
 
+    const { getStoredBackupFileName } = await import('../../../src/database/fsa');
+    vi.mocked(getStoredBackupFileName).mockImplementation(() => {
+      try {
+        const raw = localStorage.getItem(BACKUP_META_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw).name || null;
+      } catch {
+        return null;
+      }
+    });
+
     const backup = await import('../../../src/database/backup');
     triggerBackup = backup.triggerBackup;
     startBackupTimer = backup.startBackupTimer;
@@ -64,16 +77,17 @@ describe('Backup system', () => {
   afterEach(() => {
     stopBackupTimer();
     try { mockDb?.close(); } catch {}
+    localStorage.removeItem(BACKUP_META_KEY);
   });
 
   it('triggerBackup returns false when no backup handle', async () => {
-    localStorage.removeItem('hkinv-backup-handle');
+    localStorage.removeItem(BACKUP_META_KEY);
     const result = await triggerBackup(true);
     expect(result).toBe(false);
   });
 
   it('triggerBackup dispatches backup event with success=false when no handle', async () => {
-    localStorage.removeItem('hkinv-backup-handle');
+    localStorage.removeItem(BACKUP_META_KEY);
     await triggerBackup(false);
     expect(backupEvents.length).toBeGreaterThan(0);
     expect(backupEvents[0].success).toBe(false);
@@ -81,27 +95,27 @@ describe('Backup system', () => {
   });
 
   it('triggerBackup with manual=true dispatches manual event', async () => {
-    localStorage.removeItem('hkinv-backup-handle');
+    localStorage.removeItem(BACKUP_META_KEY);
     await triggerBackup(true);
     expect(backupEvents.length).toBeGreaterThan(0);
     expect(backupEvents[0].manual).toBe(true);
   });
 
   it('isBackupConfigured returns false when no handle stored', () => {
-    localStorage.removeItem('hkinv-backup-handle');
+    localStorage.removeItem(BACKUP_META_KEY);
     expect(isBackupConfigured()).toBe(false);
   });
 
   it('isBackupConfigured returns true when handle stored', () => {
-    localStorage.setItem('hkinv-backup-handle', JSON.stringify({ name: 'test.hkinv' }));
+    localStorage.setItem(BACKUP_META_KEY, JSON.stringify({ name: 'test.hkinv' }));
     expect(isBackupConfigured()).toBe(true);
-    localStorage.removeItem('hkinv-backup-handle');
+    localStorage.removeItem(BACKUP_META_KEY);
   });
 
   it('getBackupFileName returns name from stored handle', () => {
-    localStorage.setItem('hkinv-backup-handle', JSON.stringify({ name: 'my-archive.hkinv' }));
+    localStorage.setItem(BACKUP_META_KEY, JSON.stringify({ name: 'my-archive.hkinv' }));
     expect(getBackupFileName()).toBe('my-archive.hkinv');
-    localStorage.removeItem('hkinv-backup-handle');
+    localStorage.removeItem(BACKUP_META_KEY);
   });
 
   it('backup timer starts and triggers backup periodically', async () => {
@@ -123,9 +137,9 @@ describe('Backup system', () => {
   });
 
   it('isBackupConfigured returns false after clearing handle', () => {
-    localStorage.setItem('hkinv-backup-handle', JSON.stringify({ name: 'old.hkinv' }));
+    localStorage.setItem(BACKUP_META_KEY, JSON.stringify({ name: 'old.hkinv' }));
     expect(isBackupConfigured()).toBe(true);
-    localStorage.removeItem('hkinv-backup-handle');
+    localStorage.removeItem(BACKUP_META_KEY);
     expect(isBackupConfigured()).toBe(false);
   });
 });

@@ -106,6 +106,20 @@ describe('Invoices IPC', () => {
     expect(inv).not.toBeNull();
     expect(inv!.total).toBe(0);
   });
+  it('should set paid_date when status changes to paid', () => {
+    const invId = invoicesDb.createInvoice({ customer_id: cid, invoice_number: 'INV-PAID-01', issue_date: '2026-05-27', due_date: '2026-06-26', status: 'draft' }, db);
+    invoicesDb.updateInvoice(invId, { status: 'paid', paid_date: '2026-06-15' }, db);
+    const inv = invoicesDb.getInvoiceById(invId, db);
+    expect(inv!.status).toBe('paid');
+    expect(inv!.paid_date).toBe('2026-06-15');
+  });
+  it('should clear paid_date when status changes from paid to draft', () => {
+    const invId = invoicesDb.createInvoice({ customer_id: cid, invoice_number: 'INV-PAID-02', issue_date: '2026-05-27', due_date: '2026-06-26', status: 'paid', paid_date: '2026-06-15' }, db);
+    invoicesDb.updateInvoice(invId, { status: 'draft', paid_date: null }, db);
+    const inv = invoicesDb.getInvoiceById(invId, db);
+    expect(inv!.status).toBe('draft');
+    expect(inv!.paid_date).toBeNull();
+  });
 });
 
 describe('Service Types IPC', () => {

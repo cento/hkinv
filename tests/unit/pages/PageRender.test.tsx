@@ -49,6 +49,11 @@ describe('Page smoke tests - render without crashing', () => {
     expect(screen.getByText('settings.title')).toBeInTheDocument();
   });
 
+  it('SettingsPage has save button with text', async () => {
+    renderPage(SettingsPage, '/settings');
+    expect(screen.getByText('common.save')).toBeInTheDocument();
+  });
+
   it('InvoiceEditPage (new) renders without crashing - REGRESSION: useBlocker crash', async () => {
     renderPage(InvoiceEditPage, '/invoices/new');
     expect(screen.getByText('invoices.new')).toBeInTheDocument();

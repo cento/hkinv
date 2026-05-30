@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [stats, setStats] = useState<Record<string, number>>({
     totalInvoices: 0,
+    totalDraft: 0,
     totalSent: 0,
     totalPaid: 0,
     totalOverdue: 0,
@@ -48,6 +49,7 @@ export default function DashboardPage() {
       const allCustomers = customers || [];
 
       const totalInvoices = allInvoices.length;
+      const totalDraft = allInvoices.filter((i: any) => i.status === 'draft').length;
       const totalSent = allInvoices.filter((i: any) => i.status === 'sent').length;
       const totalPaid = allInvoices.filter((i: any) => i.status === 'paid').length;
       const overdue = allInvoices.filter((i: any) =>
@@ -59,6 +61,7 @@ export default function DashboardPage() {
 
       setStats({
         totalInvoices,
+        totalDraft,
         totalSent,
         totalPaid,
         totalOverdue: overdue.length,
@@ -98,7 +101,7 @@ export default function DashboardPage() {
 
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 6, sm: 4, md: 2 }}>
-          <StatCard icon={<ReceiptLongIcon />} label={t('invoices.draft')} value={stats.totalInvoices - stats.totalSent - stats.totalPaid} />
+          <StatCard icon={<ReceiptLongIcon />} label={t('invoices.draft')} value={stats.totalDraft} />
         </Grid>
         <Grid size={{ xs: 6, sm: 4, md: 2 }}>
           <StatCard icon={<ReceiptLongIcon />} label={t('invoices.sent')} value={stats.totalSent} color="primary.main" />

@@ -24,8 +24,11 @@ export async function writeOPFSFile(name: string, data: ArrayBuffer): Promise<vo
   const root = await getRoot();
   const handle = await root.getFileHandle(name, { create: true });
   const writable = await handle.createWritable();
-  await writable.write(data);
-  await writable.close();
+  try {
+    await writable.write(data);
+  } finally {
+    await writable.close();
+  }
 }
 
 export async function deleteOPFSFile(name: string): Promise<void> {

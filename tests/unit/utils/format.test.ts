@@ -71,4 +71,55 @@ describe('calculateDueDate', () => {
     const result = calculateDueDate('fine mese');
     expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
+
+  it('should return today for null payment terms', () => {
+    const result = calculateDueDate(null);
+    expect(result).toBe(todayISO());
+  });
+
+  it('should return today for undefined payment terms', () => {
+    const result = calculateDueDate(undefined);
+    expect(result).toBe(todayISO());
+  });
+
+  it('should return today for empty string', () => {
+    const result = calculateDueDate('');
+    expect(result).toBe(todayISO());
+  });
+});
+
+describe('parseHKD', () => {
+  it('should parse simple HKD string', () => {
+    expect(parseHKD('HK$1,500.00')).toBe(1500);
+  });
+
+  it('should parse zero', () => {
+    expect(parseHKD('HK$0.00')).toBe(0);
+  });
+
+  it('should parse large numbers with commas', () => {
+    expect(parseHKD('HK$1,234,567.89')).toBe(1234567.89);
+  });
+
+  it('should parse plain number string', () => {
+    expect(parseHKD('1500')).toBe(1500);
+  });
+
+  it('should handle empty string', () => {
+    const result = parseHKD('');
+    expect(Number.isNaN(result)).toBe(true);
+  });
+});
+
+describe('todayISO', () => {
+  it('should return today in YYYY-MM-DD format', () => {
+    const result = todayISO();
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('should match current date', () => {
+    const result = todayISO();
+    const expected = new Date().toISOString().split('T')[0];
+    expect(result).toBe(expected);
+  });
 });

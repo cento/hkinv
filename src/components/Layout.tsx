@@ -42,6 +42,7 @@ interface LayoutProps {
 }
 
 function BackupIndicator() {
+  const { t } = useTranslation();
   const configured = isBackupConfigured();
   const fileName = getBackupFileName();
   const lastBackup = getLastBackupTime();
@@ -50,8 +51,8 @@ function BackupIndicator() {
   const displayPath = fileName || state.dbPath || '';
 
   const title = configured
-    ? `Backup: ${fileName || 'enabled'}${lastBackup ? ' (last: ' + lastBackup.toLocaleTimeString() + ')' : ''}`
-    : 'Backup not configured';
+    ? `${t('layout.backupEnabled')}${fileName ? ` (${fileName})` : ''}${lastBackup ? ` — ${lastBackup.toLocaleTimeString()}` : ''}`
+    : t('layout.backupNotConfigured');
 
   const handleBackupNow = async () => {
     let result = await triggerBackup(true);
@@ -82,7 +83,7 @@ function BackupIndicator() {
           </IconButton>
         </Tooltip>
       )}
-      <Tooltip title="Save to file">
+      <Tooltip title={t('layout.saveToFile')}>
         <IconButton size="small" color="inherit" onClick={handleBackupNow} sx={{ opacity: 0.7 }}>
           <SaveIcon fontSize="small" />
         </IconButton>
@@ -103,10 +104,10 @@ export default function Layout({ children }: LayoutProps) {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail as { success: boolean; manual: boolean };
       if (detail.success) {
-        const label = detail.manual ? 'Saved' : 'Auto-backup done';
+        const label = detail.manual ? t('layout.saved') : t('layout.autoBackupDone');
         setBackupToast({ open: true, message: label + ' ✓', severity: 'success' });
       } else if (detail.manual) {
-        setBackupToast({ open: true, message: 'Backup not configured', severity: 'info' });
+        setBackupToast({ open: true, message: t('layout.backupNotConfigured'), severity: 'info' });
       }
     };
     window.addEventListener('hkinv:backup', handler);
