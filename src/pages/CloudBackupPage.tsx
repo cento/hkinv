@@ -74,7 +74,7 @@ export default function CloudBackupPage() {
             <ListItemText
               primary={t('cloudBackup.autoBackup') || 'Automatic backup'}
               secondary={configured
-                ? t('cloudBackup.configuredTo', { name: backupName || '' })
+                ? t('cloudBackup.configuredTo', { name: backupName || 'configured' })
                 : (t('cloudBackup.notConfigured') || 'Not configured')}
             />
           </ListItem>
