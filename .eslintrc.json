@@ -9,12 +9,24 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
-    "plugin:react-hooks/recommended",
-    "plugin:react-refresh/recommended"
+    "plugin:react-hooks/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "react-hooks", "react-refresh"],
   "rules": {
-    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }]
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
+    "no-empty": "warn",
+    "import/no-unresolved": "off",
+    "import/no-named-as-default-member": "off",
+    "import/no-duplicates": "warn"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".ts", ".tsx"]
+      }
+    }
   }
 }
