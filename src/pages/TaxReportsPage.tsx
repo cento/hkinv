@@ -46,7 +46,7 @@ export default function TaxReportsPage() {
       const { start, end } = getTaxYear(taxYear);
       const allInvoices = (await api.invoicesGetAll()) as Record<string, any>[];
       const paid = allInvoices.filter((i: any) =>
-        i.status === 'paid' && i.paid_date && i.paid_date >= start && i.paid_date <= end
+        i.status === 'paid' && (i.paid_date || i.issue_date) >= start && (i.paid_date || i.issue_date) <= end
       );
       const byCustomer: Record<string, { total: number; count: number }> = {};
       for (const inv of paid) {
