@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Paper, Grid, Tabs, Tab, Snackbar, Alert } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-import api from '../services/ipc';
+import api from '../services/dbService';
 import CustomerDialog, { CustomerFormData } from '../components/CustomerDialog';
 import CustomerRatesTable from '../components/CustomerRatesTable';
 

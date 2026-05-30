@@ -11,11 +11,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PrintIcon from '@mui/icons-material/Print';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import api from '../services/ipc';
+import api from '../services/dbService';
 import InvoiceItemsTable, { InvoiceItemRow } from '../components/InvoiceItemsTable';
 import { formatDateISO, calculateDueDate } from '../utils/format';
 import { validateInvoice } from '../utils/validators';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { downloadBlob } from '../database/fsa';
 
 export default function InvoiceEditPage() {
   const { t } = useTranslation();
@@ -57,6 +58,9 @@ export default function InvoiceEditPage() {
         setDueDate(calculateDueDate(cfg.default_payment_terms));
       }
     }).catch(console.error);
+    if (isNew) {
+      api.settingsGenerateInvoiceNumber().then(setInvoiceNumber).catch(console.error);
+    }
   }, []);
 
   // Load existing invoice for editing
@@ -294,18 +298,8 @@ export default function InvoiceEditPage() {
       });
 
       const blob = doc.output('blob');
-      const arrayBuffer = await blob.arrayBuffer();
-      const uint8Array = Array.from(new Uint8Array(arrayBuffer));
-
-      const result = await api.dialogSavePDF(`${inv.invoice_number}.pdf`);
-      if (!result.canceled && result.filePath) {
-        const writeResult = await api.fileWriteBinary(result.filePath, uint8Array);
-        if (writeResult.success) {
-          setToast({ open: true, message: 'PDF ' + t('common.save') + ' ✓', severity: 'success' });
-        } else {
-          setToast({ open: true, message: String(writeResult.error), severity: 'error' });
-        }
-      }
+      downloadBlob(blob, `${inv.invoice_number}.pdf`);
+      setToast({ open: true, message: 'PDF ' + t('common.save') + ' ✓', severity: 'success' });
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
@@ -437,6 +431,16 @@ export default function InvoiceEditPage() {
         {/* Left column: metadata */}
         <Grid size={{ xs: 12, md: 5 }}>
           <Paper sx={{ p: 2 }}>
+            {isNew && (
+              <TextField
+                fullWidth
+                label={t('invoices.number')}
+                value={invoiceNumber || '...'}
+                size="small"
+                sx={{ mb: 2 }}
+                slotProps={{ input: { readOnly: true }, inputLabel: { shrink: true } }}
+              />
+            )}
             <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>{t('invoices.customer')}</Typography>
             <Autocomplete
               options={customers}

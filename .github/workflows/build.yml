@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -21,25 +21,20 @@ jobs:
           cache: npm
 
       - run: npm ci
-        shell: pwsh
 
       - run: npx tsc --noEmit
-        shell: pwsh
 
       - run: npm run test:unit
-        shell: pwsh
 
-      - run: npm run package
-        shell: pwsh
+      - run: npm run build
 
-      - name: Zip portable app
-        run: Compress-Archive -Path out/hkinv-win32-x64/* -DestinationPath out/hkinv-portable.zip
-        shell: pwsh
+      - name: Zip static build
+        run: zip -r hkinv-webapp.zip dist/
 
       - uses: actions/upload-artifact@v4
         with:
-          name: hkinv-portable
-          path: out/hkinv-portable.zip
+          name: hkinv-webapp
+          path: hkinv-webapp.zip
           if-no-files-found: error
 
   release:
@@ -52,10 +47,10 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: hkinv-portable
+          name: hkinv-webapp
           path: .
 
       - uses: softprops/action-gh-release@v2
         with:
-          files: hkinv-portable.zip
+          files: hkinv-webapp.zip
           generate_release_notes: true

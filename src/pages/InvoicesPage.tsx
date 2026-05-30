@@ -5,9 +5,10 @@ import { DataGrid, GridColDef, GridRowParams, GridToolbar } from '@mui/x-data-gr
 import AddIcon from '@mui/icons-material/Add';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/ipc';
+import api from '../services/dbService';
 import InvoiceFilters, { FilterValues, defaultFilters } from '../components/InvoiceFilters';
 import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
+import { downloadBlob } from '../database/fsa';
 
 const statusColors: Record<string, 'default' | 'primary' | 'success' | 'error' | 'warning'> = {
   draft: 'default',
@@ -105,18 +106,8 @@ export default function InvoicesPage() {
         language: (localStorage.getItem('app-language') || 'it') as 'it' | 'en',
       });
       const blob = doc.output('blob');
-      const arrayBuffer = await blob.arrayBuffer();
-      const uint8Array = Array.from(new Uint8Array(arrayBuffer));
-
-      const result = await api.dialogSavePDF(`${full.invoice_number}.pdf`);
-      if (!result.canceled && result.filePath) {
-        const writeResult = await api.fileWriteBinary(result.filePath, uint8Array);
-        if (writeResult.success) {
-          setToast({ open: true, message: 'PDF ' + t('common.save') + ' ✓', severity: 'success' });
-        } else {
-          setToast({ open: true, message: String(writeResult.error), severity: 'error' });
-        }
-      }
+      downloadBlob(blob, `${full.invoice_number}.pdf`);
+      setToast({ open: true, message: 'PDF ' + t('common.save') + ' ✓', severity: 'success' });
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
@@ -157,17 +148,9 @@ export default function InvoicesPage() {
         headers,
         rows
       );
-
-      const uint8Array = new TextEncoder().encode(csv);
-      const result = await api.dialogSaveFile(`${full.invoice_number}.csv`);
-      if (!result.canceled && result.filePath) {
-        const writeResult = await api.fileWriteBinary(result.filePath, Array.from(uint8Array));
-        if (writeResult.success) {
-          setToast({ open: true, message: 'CSV ' + t('common.save') + ' ✓', severity: 'success' });
-        } else {
-          setToast({ open: true, message: String(writeResult.error), severity: 'error' });
-        }
-      }
+      const blob = new Blob([csv], { type: 'text/csv' });
+      downloadBlob(blob, `${full.invoice_number}.csv`);
+      setToast({ open: true, message: 'CSV ' + t('common.save') + ' ✓', severity: 'success' });
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
@@ -178,16 +161,16 @@ export default function InvoicesPage() {
   };
 
   const columns: GridColDef[] = [
-    { field: 'invoice_number', headerName: t('invoices.number'), flex: 1.5 },
-    { field: 'customer_name', headerName: t('invoices.customer'), flex: 2 },
-    { field: 'issue_date', headerName: t('invoices.date'), flex: 1 },
-    { field: 'due_date', headerName: t('invoices.dueDate'), flex: 1 },
+    { field: 'invoice_number', headerName: t('invoices.number'), flex: 1.5, minWidth: 120 },
+    { field: 'customer_name', headerName: t('invoices.customer'), flex: 1.5, minWidth: 120 },
+    { field: 'issue_date', headerName: t('invoices.date'), flex: 1, minWidth: 100 },
+    { field: 'due_date', headerName: t('invoices.dueDate'), flex: 1, minWidth: 100 },
     {
-      field: 'total', headerName: t('invoices.total'), flex: 1,
+      field: 'total', headerName: t('invoices.total'), flex: 1, minWidth: 100,
       valueFormatter: (val: number) => `${val?.toFixed(2)} HKD`,
     },
     {
-      field: 'status', headerName: t('invoices.status'), flex: 0.8,
+      field: 'status', headerName: t('invoices.status'), flex: 0.8, minWidth: 90,
       renderCell: (params) => (
         <Chip
           label={t(`invoices.${params.value}`)}
@@ -198,7 +181,7 @@ export default function InvoicesPage() {
       ),
     },
     {
-      field: 'actions', headerName: '', flex: 0.8, sortable: false,
+      field: 'actions', headerName: '', flex: 1.2, minWidth: 240, sortable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5 }}>
           <Button size="small" onClick={(e) => {

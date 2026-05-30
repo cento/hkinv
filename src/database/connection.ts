@@ -1,10 +1,7 @@
-import { createRequire } from 'node:module';
-import path from 'node:path';
-import fs from 'node:fs';
+import initSqlJs from 'sql.js';
 import type { Database as SqlJsDatabase, SqlJsStatic } from 'sql.js';
-import type initSqlJs from 'sql.js';
-
-const _require = createRequire(__filename);
+import wasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
+import { readOPFSFile, writeOPFSFile, DB_FILENAME } from './opfs';
 
 let db: SqlJsDatabase | null = null;
 let dbFilePath: string | null = null;
@@ -12,60 +9,67 @@ let SQL: SqlJsStatic | null = null;
 
 async function getSql() {
   if (!SQL) {
-    const sqlJsPath = path.join(process.resourcesPath || '', 'dist', 'sql-wasm.js');
-    const init = (fs.existsSync(sqlJsPath)
-      ? _require(sqlJsPath)
-      : _require('sql.js')) as typeof initSqlJs;
-    SQL = await init();
+    SQL = await initSqlJs({
+      locateFile: () => wasmUrl,
+    });
   }
-  return SQL!;
+  return SQL;
 }
 
-/**
- * Saves the database to disk.
- */
 export function saveDatabase(): void {
-  if (!db || !dbFilePath) return;
-  const data = db.export();
-  fs.writeFileSync(dbFilePath, Buffer.from(data));
+  if (!db) return;
+  const data = new Uint8Array(db.export());
+  writeOPFSFile(DB_FILENAME, data.buffer);
 }
 
-/**
- * Creates a new SQLite database file at the given path.
- */
-export async function createDatabase(filePath: string): Promise<SqlJsDatabase> {
-  const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
+export async function createDatabase(): Promise<SqlJsDatabase> {
   const sql = await getSql();
   db = new sql.Database();
-  dbFilePath = filePath;
+  dbFilePath = DB_FILENAME;
   db.run('PRAGMA foreign_keys = ON');
   db.run('PRAGMA journal_mode = MEMORY');
   saveDatabase();
   return db;
 }
 
-/**
- * Opens an existing SQLite database file.
- */
-export async function openDatabase(filePath: string): Promise<SqlJsDatabase> {
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Database file not found: ${filePath}`);
+let onSaveCallback: (() => void) | null = null;
+
+export function onSave(callback: () => void): void {
+  onSaveCallback = callback;
+}
+
+export function notifySave() {
+  if (onSaveCallback) onSaveCallback();
+}
+
+export { saveDatabase as saveToOPFS };
+
+export async function openDatabase(): Promise<SqlJsDatabase> {
+  const buffer = await readOPFSFile(DB_FILENAME);
+  if (!buffer) {
+    return createDatabase();
   }
   const sql = await getSql();
-  const fileBuffer = fs.readFileSync(filePath);
-  db = new sql.Database(fileBuffer);
-  dbFilePath = filePath;
+  db = new sql.Database(new Uint8Array(buffer));
+  dbFilePath = DB_FILENAME;
   db.run('PRAGMA foreign_keys = ON');
   db.run('PRAGMA journal_mode = MEMORY');
   return db;
 }
 
-/**
- * Returns the current database instance.
- */
+export async function importDatabase(buffer: ArrayBuffer): Promise<SqlJsDatabase> {
+  const sql = await getSql();
+  if (db) {
+    db.close();
+  }
+  db = new sql.Database(new Uint8Array(buffer));
+  dbFilePath = DB_FILENAME;
+  db.run('PRAGMA foreign_keys = ON');
+  db.run('PRAGMA journal_mode = MEMORY');
+  await writeOPFSFile(DB_FILENAME, buffer);
+  return db;
+}
+
 export function getDatabase(): SqlJsDatabase {
   if (!db) {
     throw new Error('Database not initialized.');
@@ -73,9 +77,6 @@ export function getDatabase(): SqlJsDatabase {
   return db;
 }
 
-/**
- * Closes the database and saves.
- */
 export function closeDatabase(): void {
   if (db) {
     saveDatabase();
@@ -85,16 +86,10 @@ export function closeDatabase(): void {
   }
 }
 
-/**
- * Whether the database is connected.
- */
 export function isDatabaseOpen(): boolean {
   return db !== null;
 }
 
-/**
- * Returns the current DB file path, or null if closed.
- */
 export function getDbPath(): string | null {
   return dbFilePath;
 }

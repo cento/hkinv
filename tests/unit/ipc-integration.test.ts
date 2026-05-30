@@ -93,6 +93,19 @@ describe('Invoices IPC', () => {
     invoicesDb.createInvoice({ customer_id: cid, invoice_number: 'INV-003', issue_date: '2026-05-27', due_date: '2026-06-26', status: 'draft' }, db);
     expect(invoicesDb.searchInvoices({ status: 'draft' }, db).length).toBe(1);
   });
+  it('should reject createInvoice without invoice_number', () => {
+    expect(() => {
+      invoicesDb.createInvoice({ customer_id: cid, issue_date: '2026-05-27', due_date: '2026-06-26', status: 'draft' }, db);
+    }).toThrow('invoice_number is required');
+  });
+  it('should create invoice with createInvoiceWithNumber without total', () => {
+    e("INSERT INTO settings (id,teacher_name,teacher_address,invoice_prefix,invoice_counter,default_payment_terms,default_currency,created_at,updated_at) VALUES (1,'T','A','INV-',1,'30','HKD',datetime('now'),datetime('now'))");
+    const invId = invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-05-27', due_date: '2026-06-26', status: 'draft' }, db);
+    expect(invId).toBeGreaterThan(0);
+    const inv = invoicesDb.getInvoiceById(invId, db);
+    expect(inv).not.toBeNull();
+    expect(inv!.total).toBe(0);
+  });
 });
 
 describe('Service Types IPC', () => {

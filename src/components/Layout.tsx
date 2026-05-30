@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,6 +16,9 @@ import {
   Divider,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PeopleIcon from '@mui/icons-material/People';
@@ -25,13 +28,67 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import BackupIcon from '@mui/icons-material/Backup';
+import SaveIcon from '@mui/icons-material/Save';
 import { useAppContext } from '../contexts/AppContext';
 import { changeLanguage } from '../i18n/index';
+import { isBackupConfigured, getBackupFileName, getLastBackupTime, triggerBackup } from '../database/backup';
+import { configureBackupLocation } from '../database/fsa';
 
 const DRAWER_WIDTH = 240;
 
 interface LayoutProps {
   children: React.ReactNode;
+}
+
+function BackupIndicator() {
+  const configured = isBackupConfigured();
+  const fileName = getBackupFileName();
+  const lastBackup = getLastBackupTime();
+  const { state } = useAppContext();
+
+  const displayPath = fileName || state.dbPath || '';
+
+  const title = configured
+    ? `Backup: ${fileName || 'enabled'}${lastBackup ? ' (last: ' + lastBackup.toLocaleTimeString() + ')' : ''}`
+    : 'Backup not configured';
+
+  const handleBackupNow = async () => {
+    let result = await triggerBackup(true);
+    if (!result) {
+      const ok = await configureBackupLocation();
+      if (ok) {
+        result = await triggerBackup(true);
+      }
+    }
+  };
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      {displayPath && (
+        <Typography variant="caption" sx={{ opacity: 0.7, mr: 1 }} noWrap>
+          {displayPath}
+        </Typography>
+      )}
+      {configured && (
+        <Tooltip title={title}>
+          <IconButton
+            size="small"
+            color="success"
+            onClick={handleBackupNow}
+            sx={{ opacity: 0.8 }}
+          >
+            <BackupIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
+      <Tooltip title="Save to file">
+        <IconButton size="small" color="inherit" onClick={handleBackupNow} sx={{ opacity: 0.7 }}>
+          <SaveIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </Box>
+  );
 }
 
 export default function Layout({ children }: LayoutProps) {
@@ -40,6 +97,21 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const { state, setLanguage, toggleDarkMode } = useAppContext();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [backupToast, setBackupToast] = React.useState<{ open: boolean; message: string; severity: 'success' | 'info' | 'error' }>({ open: false, message: '', severity: 'success' });
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { success: boolean; manual: boolean };
+      if (detail.success) {
+        const label = detail.manual ? 'Saved' : 'Auto-backup done';
+        setBackupToast({ open: true, message: label + ' ✓', severity: 'success' });
+      } else if (detail.manual) {
+        setBackupToast({ open: true, message: 'Backup not configured', severity: 'info' });
+      }
+    };
+    window.addEventListener('hkinv:backup', handler);
+    return () => window.removeEventListener('hkinv:backup', handler);
+  }, []);
 
   const menuItems = [
     { text: t('nav.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
@@ -121,11 +193,7 @@ export default function Layout({ children }: LayoutProps) {
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
             {t('app.title')}
           </Typography>
-          {state.dbPath && (
-            <Typography variant="caption" sx={{ opacity: 0.7 }} noWrap>
-              {state.dbPath}
-            </Typography>
-          )}
+          {state.isDbOpen && <BackupIndicator />}
         </Toolbar>
       </AppBar>
 
@@ -167,6 +235,17 @@ export default function Layout({ children }: LayoutProps) {
       >
         {children}
       </Box>
+
+      <Snackbar
+        open={backupToast.open}
+        autoHideDuration={3000}
+        onClose={() => setBackupToast(t => ({ ...t, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity={backupToast.severity} variant="filled" sx={{ minWidth: 200 }}>
+          {backupToast.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

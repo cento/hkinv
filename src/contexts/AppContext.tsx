@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import { hasSettings } from '../database/settings';
+import { stopBackupTimer, startBackupTimer } from '../database/backup';
 
 export interface AppState {
   dbPath: string | null;
@@ -31,22 +33,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(initialState);
 
-  // On mount, check if the main process already has a DB open
-  // (e.g. after E2E test IPC setup or page reload with active connection)
   useEffect(() => {
-    (async () => {
-      try {
-        const isOpen = await window.api.dbIsOpen();
-        if (isOpen && !state.isDbOpen) {
-          setState(prev => ({ ...prev, isDbOpen: true }));
-          // Also check if settings exist
-          try {
-            const hasSettings = await window.api.settingsHas();
-            setState(prev => ({ ...prev, isSettingsComplete: hasSettings }));
-          } catch { /* ignore */ }
-        }
-      } catch { /* ignore */ }
-    })();
+    return () => { stopBackupTimer(); };
   }, []);
 
   const setDbPath = useCallback((path: string | null) => {
@@ -59,6 +47,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const setSettingsComplete = useCallback((complete: boolean) => {
     setState(prev => ({ ...prev, isSettingsComplete: complete }));
+    if (complete) {
+      startBackupTimer();
+    }
   }, []);
 
   const setLanguage = useCallback((lang: string) => {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, Typography, TextField, Button, Paper, Grid, Snackbar, Alert } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { useAppContext } from '../contexts/AppContext';
-import api from '../services/ipc';
+import api from '../services/dbService';
 
 export default function SettingsPage() {
   const { t } = useTranslation();

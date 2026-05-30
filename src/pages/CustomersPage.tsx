@@ -4,7 +4,7 @@ import { Box, Typography, Button, Snackbar, Alert } from '@mui/material';
 import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/ipc';
+import api from '../services/dbService';
 import CustomerDialog, { CustomerFormData } from '../components/CustomerDialog';
 import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
 

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, Typography, Button, Snackbar, Alert } from '@mui/material';
 import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
-import api from '../services/ipc';
+import api from '../services/dbService';
 import ServiceTypeDialog, { ServiceTypeFormData } from '../components/ServiceTypeDialog';
 import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
 

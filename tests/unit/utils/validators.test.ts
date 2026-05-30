@@ -65,6 +65,11 @@ describe('validateInvoice', () => {
     const result = validateInvoice({ customer_id: 1, issue_date: '2026-05-26' });
     expect(result.valid).toBe(true);
   });
+
+  it('should not require invoice_number (auto-generated)', () => {
+    const result = validateInvoice({ customer_id: 1, issue_date: '2026-05-26' });
+    expect(result.valid).toBe(true);
+  });
 });
 
 describe('validateInvoiceItem', () => {

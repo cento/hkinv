@@ -126,6 +126,9 @@ function getLastInsertId(db: SqlJsDatabase, table: string): number {
 }
 
 export function createInvoice(data: InvoiceInput & { invoice_number?: string }, _db?: SqlJsDatabase): number {
+  if (!data.invoice_number) {
+    throw new Error('invoice_number is required');
+  }
   const conn = _db || getDatabase();
   const now = new Date().toISOString();
   e(conn, `INSERT INTO invoices (invoice_number, issue_date, due_date, customer_id, status, currency,
@@ -294,7 +297,7 @@ export function createInvoiceWithNumber(data: InvoiceInput, _db?: SqlJsDatabase)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [invNum, data.issue_date, data.due_date, data.customer_id,
          data.status ?? 'draft', data.currency ?? 'HKD',
-         data.subtotal ?? 0, data.discount_percent ?? 0, data.discount_amount ?? 0,
+         data.subtotal ?? 0, data.discount_percent ?? 0, data.discount_amount ?? 0, data.total ?? 0,
          data.notes ?? null, data.payment_terms ?? null, now, now]);
       incrementCounter(conn);
       const id = getLastInsertId(conn, 'invoices');
