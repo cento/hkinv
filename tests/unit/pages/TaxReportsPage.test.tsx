@@ -12,6 +12,9 @@ vi.mock('../../../src/services/dbService', () => ({
       { id: 2, status: 'paid', paid_date: '2026-07-20', total: 2000, customer_name: 'School B', customer_id: 2, invoice_number: 'INV-002', issue_date: '2026-07-01', due_date: '2026-08-01' },
       { id: 3, status: 'draft', total: 500, customer_name: 'School A', customer_id: 1, invoice_number: 'INV-003', issue_date: '2026-08-01', due_date: '2026-09-01' },
     ]),
+    settingsGet: vi.fn().mockResolvedValue({
+      teacher_name: 'Test Teacher', teacher_address: 'HK', br_number: 'BR123',
+    }),
   },
 }));
 
@@ -31,8 +34,8 @@ describe('TaxReportsPage', () => {
 
   it('shows customer breakdown', async () => {
     renderPage();
-    await waitFor(() => expect(screen.getByText('School A')).toBeInTheDocument(), { timeout: 5000 });
-    expect(screen.getByText('School B')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getAllByText('School A').length).toBeGreaterThanOrEqual(1), { timeout: 5000 });
+    expect(screen.getAllByText('School B').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders export buttons', async () => {
