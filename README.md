@@ -155,3 +155,7 @@ Record retention: 7 years (IRD requirement).
 ## License
 
 MIT
+
+---
+
+[Changelog](VERSION.md) · [Code Review](code_review.md)
