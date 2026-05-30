@@ -8,7 +8,7 @@ import BackupIcon from '@mui/icons-material/Backup';
 import { useAppContext } from '../contexts/AppContext';
 import { createDatabase, importDatabase, openDatabase, getDatabase } from '../database/connection';
 import { hasExistingDB } from '../database/opfs';
-import { openHKINVFile, configureBackupLocation, storeBackupHandle, getStoredBackupFileName } from '../database/fsa';
+import { openHKINVFile, configureBackupLocation } from '../database/fsa';
 import { hasSettings } from '../database/settings';
 import { runMigrations } from '../database/migrations';
 import { startBackupTimer } from '../database/backup';
@@ -40,12 +40,10 @@ export default function WelcomePage() {
 
   useEffect(() => {
     hasExistingDB().then(setHasDB);
-    setRecent(getRecentFiles());
     const files = getRecentFiles();
+    setRecent(files);
     if (files.length > 0) {
       setActiveArchive(files[0].name);
-    } else {
-      setActiveArchive(getStoredBackupFileName());
     }
   }, []);
 
@@ -80,8 +78,6 @@ export default function WelcomePage() {
       if (result.handle) {
         const file = await result.handle.getFile();
         fileName = file.name;
-        await storeBackupHandle(result.handle);
-        startBackupTimer();
       }
       afterDbOpen(fileName);
     } catch (err: any) {
@@ -92,10 +88,8 @@ export default function WelcomePage() {
   const handleOpenExisting = async () => {
     try {
       await openDatabase();
-      const backupName = getStoredBackupFileName();
       const recentFiles = getRecentFiles();
-      const archiveName = backupName || (recentFiles.length > 0 ? recentFiles[0].name : undefined);
-      afterDbOpen(archiveName);
+      afterDbOpen(recentFiles.length > 0 ? recentFiles[0].name : undefined);
     } catch (err: any) {
       setToast({ open: true, message: t('common.error') + ': ' + String(err), severity: 'error' });
     }
