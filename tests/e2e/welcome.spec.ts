@@ -24,7 +24,6 @@ test.describe("App Launch", () => {
     const { app, win } = await launchApp();
     await expect(win.getByRole("button", { name: /Create new archive/i })).toBeVisible();
     await expect(win.getByRole("button", { name: /Open existing archive/i })).toBeVisible();
-    await expect(win.getByRole("button", { name: /Import archive/i })).toBeVisible();
     await expect(win.locator("text=HK Invoice Manager")).toBeVisible();
     await app.close();
   });

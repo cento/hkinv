@@ -12,7 +12,6 @@ export interface ElectronAPI {
   dialogSaveFile: (defaultName: string) => Promise<{ canceled: boolean; filePath?: string }>;
   dialogSavePDF: (defaultName: string) => Promise<{ canceled: boolean; filePath?: string }>;
   fileWriteBinary: (filePath: string, data: number[]) => Promise<{ success: boolean; error?: string }>;
-  dialogImportFile: (defaultName: string) => Promise<{ canceled: boolean; success?: boolean; filePath?: string; error?: string }>;
 
   // Settings
   settingsGet: () => Promise<Record<string, unknown> | null>;

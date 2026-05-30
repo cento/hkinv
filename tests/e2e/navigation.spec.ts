@@ -25,22 +25,22 @@ test.describe("Navigation UI", () => {
       invoice_prefix: "INV-", invoice_counter: 1, default_currency: "HKD", default_payment_terms: "30",
     }));
     await win.reload();
-    await win.waitForFunction(() => window.location.pathname !== "/", { timeout: 15000 });
+    await win.waitForFunction(() => window.location.hash.includes("/dashboard"), { timeout: 15000 });
 
     await win.getByText("Customers").click();
     await win.waitForTimeout(500);
-    let p = await win.evaluate(() => window.location.pathname);
-    expect(p).toContain("/customers");
+    let h = await win.evaluate(() => window.location.hash);
+    expect(h).toContain("/customers");
 
     await win.getByText("Settings").click();
     await win.waitForTimeout(500);
-    p = await win.evaluate(() => window.location.pathname);
-    expect(p).toContain("/settings");
+    h = await win.evaluate(() => window.location.hash);
+    expect(h).toContain("/settings");
 
     await win.getByText("Invoices").first().click();
     await win.waitForTimeout(500);
-    p = await win.evaluate(() => window.location.pathname);
-    expect(p).toContain("/invoices");
+    h = await win.evaluate(() => window.location.hash);
+    expect(h).toContain("/invoices");
 
     await closeApp(app, db);
   });
@@ -54,7 +54,7 @@ test.describe("Navigation UI", () => {
       invoice_prefix: "INV-", invoice_counter: 1, default_currency: "HKD", default_payment_terms: "30",
     }));
     await win.reload();
-    await win.waitForFunction(() => window.location.pathname !== "/", { timeout: 15000 });
+    await win.waitForFunction(() => window.location.hash.includes("/dashboard"), { timeout: 15000 });
 
     const itBtn = win.getByRole("button", { name: "IT", exact: true });
     const enBtn = win.getByRole("button", { name: "EN", exact: true });

@@ -19,7 +19,6 @@ export const api: ElectronAPI = {
   dialogSaveFile: (name: string) => windowApi.dialogSaveFile(name),
   dialogSavePDF: (name: string) => windowApi.dialogSavePDF(name),
   fileWriteBinary: (filePath: string, data: number[]) => windowApi.fileWriteBinary(filePath, data),
-  dialogImportFile: (name: string) => windowApi.dialogImportFile(name),
 
   // Settings
   settingsGet: () => windowApi.settingsGet(),

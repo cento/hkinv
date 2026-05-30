@@ -14,7 +14,6 @@ const api = {
   dialogSaveFile: (defaultName: string) => ipcRenderer.invoke('dialog:saveFile', defaultName),
   dialogSavePDF: (defaultName: string) => ipcRenderer.invoke('dialog:savePDF', defaultName),
   fileWriteBinary: (filePath: string, data: number[]) => ipcRenderer.invoke('file:writeBinary', filePath, data),
-  dialogImportFile: (defaultName: string) => ipcRenderer.invoke('dialog:importFile', defaultName),
 
   // Settings
   settingsGet: () => ipcRenderer.invoke('settings:get'),

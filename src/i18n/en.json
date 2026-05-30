@@ -33,7 +33,7 @@
   "welcome.title": "Welcome to HK Invoice Manager",
   "welcome.newDb": "Create new archive",
   "welcome.openDb": "Open existing archive",
-  "welcome.importDb": "Import archive from file",
+
   "welcome.lastOpened": "Last opened archive",
   "welcome.createNew": "Create a new invoice archive to get started",
 

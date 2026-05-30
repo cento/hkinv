@@ -139,33 +139,6 @@ ipcMain.handle('db:backup', async () => {
   }
 });
 
-// Import archive: open file dialog and read file for copying
-ipcMain.handle('dialog:importFile', async (_event, defaultName: string) => {
-  if (!mainWindow) return { canceled: true };
-  // First, select source file
-  const openResult = await dialog.showOpenDialog(mainWindow, {
-    title: 'Seleziona archivio da importare',
-    filters: [{ name: 'HK Invoice Files', extensions: ['hkinv'] }],
-    properties: ['openFile'],
-  });
-  if (openResult.canceled || !openResult.filePaths?.[0]) return { canceled: true };
-  const sourcePath = openResult.filePaths[0];
-
-  // Then, choose destination
-  const saveResult = await dialog.showSaveDialog(mainWindow, {
-    title: 'Salva archivio importato come...',
-    defaultPath: defaultName,
-    filters: [{ name: 'HK Invoice Files', extensions: ['hkinv'] }],
-  });
-  if (saveResult.canceled || !saveResult.filePath) return { canceled: true };
-
-  try {
-    fs.copyFileSync(sourcePath, saveResult.filePath);
-    return { success: true, filePath: saveResult.filePath };
-  } catch (error) {
-    return { success: false, error: String(error) };
-  }
-});
 
 // ----- IPC Handlers: Settings -----
 

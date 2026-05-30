@@ -97,13 +97,6 @@ export default function WelcomePage() {
           >
             {t('welcome.openDb')}
           </Button>
-          <Button
-            variant="text"
-            size="large"
-            sx={{ px: 4, py: 1.5 }}
-          >
-            {t('welcome.importDb')}
-          </Button>
         </Stack>
 
         {recent.length > 0 && (
