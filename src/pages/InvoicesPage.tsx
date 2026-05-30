@@ -31,10 +31,14 @@ export default function InvoicesPage() {
   const [overdueCount, setOverdueCount] = useState(0);
   const [hidePaid, setHidePaid] = useState(false);
   const [selectedIds, setSelectedIds] = useState<GridRowSelectionModel>([]);
+  const [selectionKey, setSelectionKey] = useState(0);
 
   const handleBatchStatus = async (status: string) => {
     try {
-      for (const id of selectedIds) {
+      const ids = selectedIds;
+      setSelectionKey(k => k + 1);
+      setSelectedIds([]);
+      for (const id of ids) {
         await api.invoicesUpdate(Number(id), { status } as any);
         if (status === 'paid') {
           await api.invoicesUpdate(Number(id), { paid_date: new Date().toISOString().split('T')[0] } as any);
@@ -49,8 +53,11 @@ export default function InvoicesPage() {
   };
 
   const handleBatchExport = async () => {
+    const ids = selectedIds;
+    setSelectionKey(k => k + 1);
+    setSelectedIds([]);
     try {
-      for (const id of selectedIds) {
+      for (const id of ids) {
         const inv = (await api.invoicesGetById(Number(id))) as Record<string, any> | null;
         if (!inv) continue;
         const customer = (await api.customersGetById(inv.customer_id as number)) as Record<string, any> | null;
@@ -315,15 +322,14 @@ export default function InvoicesPage() {
 
       <Box sx={{ height: 'calc(100vh - 280px)' }}>
         <DataGrid
+          key={selectionKey}
           rows={displayedInvoices}
           columns={columns}
           loading={loading}
           pageSizeOptions={[25, 50]}
           checkboxSelection
-          rowSelectionPropagation={{ parents: false, children: false }}
           disableRowSelectionOnClick
           onRowSelectionModelChange={setSelectedIds}
-          rowSelectionModel={selectedIds}
           slots={{ toolbar: GridToolbar, noRowsOverlay: EmptyState, footer: () => null }}
           slotProps={{ noRowsOverlay: { message: t('invoices.noInvoices'), actionLabel: t('invoices.new'), onAction: () => navigate('/invoices/new') } as any }}
         />
