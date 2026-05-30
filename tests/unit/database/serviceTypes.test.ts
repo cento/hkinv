@@ -1,79 +1,59 @@
-import { describe, it, expect } from 'vitest';
-import { createTestDb, q, qa, e } from './helpers';
+import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
+import initSqlJs from 'sql.js';
+import { Database as SqlJsDatabase } from 'sql.js';
+import { runMigrations } from '../../../src/database/migrations';
+import * as serviceTypesDb from '../../../src/database/serviceTypes';
+import * as customersDb from '../../../src/database/customers';
+import * as customerRatesDb from '../../../src/database/customerRates';
+
+let db: SqlJsDatabase;
+let SQL: any;
+
+beforeAll(async () => { SQL = await initSqlJs(); });
+beforeEach(() => { db = new SQL.Database(); db.run('PRAGMA foreign_keys = ON'); runMigrations(db); });
 
 describe('Service Types', () => {
-  it('should create a service type', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO service_types (name, description_template, default_rate, default_hours, created_at, updated_at)
-      VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`,
-      ['Lezione individuale', 'Lezione di italiano individuale', 500, 1]);
-    
-    const row = q(db, 'SELECT * FROM service_types');
-    expect(row).toBeDefined();
-    expect(row!.name).toBe('Lezione individuale');
-    expect(row!.default_rate).toBe(500);
-    expect(row!.default_hours).toBe(1);
-    db.close();
+  it('should create a service type', () => {
+    const id = serviceTypesDb.createServiceType({
+      name: 'Lezione individuale', description_template: 'Lezione di italiano individuale',
+      default_rate: 500, default_hours: 1,
+    }, db);
+    const st = serviceTypesDb.getServiceTypeById(id, db);
+    expect(st).toBeDefined();
+    expect(st!.name).toBe('Lezione individuale');
+    expect(st!.default_rate).toBe(500);
+    expect(st!.default_hours).toBe(1);
   });
 
-  it('should get all service types ordered by name', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO service_types (name, default_rate, default_hours, created_at, updated_at) VALUES (?, ?, ?, datetime('now'), datetime('now'))`, ['Workshop', 1000, 3]);
-    e(db, `INSERT INTO service_types (name, default_rate, default_hours, created_at, updated_at) VALUES (?, ?, ?, datetime('now'), datetime('now'))`, ['Gruppo', 350, 1.5]);
-    e(db, `INSERT INTO service_types (name, default_rate, default_hours, created_at, updated_at) VALUES (?, ?, ?, datetime('now'), datetime('now'))`, ['Individuale', 500, 1]);
-    
-    const all = qa(db, 'SELECT * FROM service_types ORDER BY name ASC');
+  it('should get all service types ordered by name', () => {
+    serviceTypesDb.createServiceType({ name: 'Workshop', default_rate: 1000, default_hours: 3 }, db);
+    serviceTypesDb.createServiceType({ name: 'Gruppo', default_rate: 350, default_hours: 1.5 }, db);
+    serviceTypesDb.createServiceType({ name: 'Individuale', default_rate: 500, default_hours: 1 }, db);
+    const all = serviceTypesDb.getAllServiceTypes(db);
+    expect(all).toHaveLength(3);
     expect(all[0].name).toBe('Gruppo');
     expect(all[1].name).toBe('Individuale');
     expect(all[2].name).toBe('Workshop');
-    expect(all).toHaveLength(3);
-    db.close();
   });
 
-  it('should update a service type', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO service_types (name, default_rate, default_hours, created_at, updated_at) VALUES (?, ?, ?, datetime('now'), datetime('now'))`, ['Lezione', 500, 1]);
-    const row = q(db, 'SELECT id FROM service_types');
-    const id = row!.id as number;
-    
-    e(db, 'UPDATE service_types SET default_rate = ? WHERE id = ?', [550, id]);
-    const updated = q(db, 'SELECT * FROM service_types WHERE id = ?', [id]);
-    expect(updated!.default_rate).toBe(550);
-    db.close();
+  it('should update a service type', () => {
+    const id = serviceTypesDb.createServiceType({ name: 'Lezione', default_rate: 500, default_hours: 1 }, db);
+    serviceTypesDb.updateServiceType(id, { default_rate: 550 }, db);
+    const st = serviceTypesDb.getServiceTypeById(id, db);
+    expect(st!.default_rate).toBe(550);
   });
 
-  it('should delete a service type', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO service_types (name, default_rate, default_hours, created_at, updated_at) VALUES (?, ?, ?, datetime('now'), datetime('now'))`, ['Temp', 100, 1]);
-    const row = q(db, 'SELECT id FROM service_types');
-    const id = row!.id as number;
-    
-    e(db, 'DELETE FROM service_types WHERE id = ?', [id]);
-    const after = q(db, 'SELECT * FROM service_types WHERE id = ?', [id]);
-    expect(after).toBeUndefined();
-    db.close();
+  it('should delete a service type', () => {
+    const id = serviceTypesDb.createServiceType({ name: 'Temp', default_rate: 100, default_hours: 1 }, db);
+    serviceTypesDb.deleteServiceType(id, db);
+    expect(serviceTypesDb.getServiceTypeById(id, db)).toBeNull();
   });
 
-  it('should detect if service type is in use', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO service_types (name, default_rate, default_hours, created_at, updated_at) VALUES (?, ?, ?, datetime('now'), datetime('now'))`, ['Test', 100, 1]);
-    const svc = q(db, 'SELECT id FROM service_types');
-    const svcId = svc!.id as number;
-    
-    e(db, `INSERT INTO customers (name, created_at, updated_at) VALUES (?, datetime('now'), datetime('now'))`, ['Customer']);
-    const cust = q(db, 'SELECT id FROM customers');
-    const custId = cust!.id as number;
-    
-    // No customer_rates yet → not in use
-    const notInUse = q(db, 'SELECT 1 FROM customer_rates WHERE service_type_id = ? LIMIT 1', [svcId]);
-    expect(notInUse).toBeUndefined();
-    
-    // Add customer rate
-    e(db, `INSERT INTO customer_rates (customer_id, service_type_id, custom_rate, created_at, updated_at) VALUES (?, ?, ?, datetime('now'), datetime('now'))`, [custId, svcId, 450]);
-    
-    // Now it should be in use
-    const inUse = q(db, 'SELECT 1 FROM customer_rates WHERE service_type_id = ? LIMIT 1', [svcId]);
-    expect(inUse).toBeDefined();
-    db.close();
+  it('should detect if service type is in use', () => {
+    const svcId = serviceTypesDb.createServiceType({ name: 'Test', default_rate: 100, default_hours: 1 }, db);
+    const custId = customersDb.createCustomer({ name: 'Customer' }, db);
+    expect(serviceTypesDb.isServiceTypeInUse(svcId, db)).toBe(false);
+    customerRatesDb.setCustomerRate(custId, svcId, 450, null, db);
+    expect(serviceTypesDb.isServiceTypeInUse(svcId, db)).toBe(true);
   });
 });

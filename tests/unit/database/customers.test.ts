@@ -1,69 +1,60 @@
-import { describe, it, expect } from 'vitest';
-import { createTestDb, q, qa, e } from './helpers';
+import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
+import initSqlJs from 'sql.js';
+import { Database as SqlJsDatabase } from 'sql.js';
+import { runMigrations } from '../../../src/database/migrations';
+import * as customersDb from '../../../src/database/customers';
+
+let db: SqlJsDatabase;
+let SQL: any;
+
+beforeAll(async () => { SQL = await initSqlJs(); });
+beforeEach(() => { db = new SQL.Database(); db.run('PRAGMA foreign_keys = ON'); runMigrations(db); });
 
 describe('Customers', () => {
-  it('should create a customer with all fields', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO customers (name, address, contact_person, email, phone, notes, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-      ['Scuola Italiana HK', '15/F Central', 'Paola B.', 'paola@scuola.hk', '+852 1234', 'Note test']);
-    
-    const row = q(db, 'SELECT * FROM customers');
-    expect(row).toBeDefined();
-    expect(row!.name).toBe('Scuola Italiana HK');
-    expect(row!.email).toBe('paola@scuola.hk');
-    expect(row!.contact_person).toBe('Paola B.');
-    db.close();
+  it('should create a customer with all fields', () => {
+    const id = customersDb.createCustomer({
+      name: 'Scuola Italiana HK', address: '15/F Central', contact_person: 'Paola B.',
+      email: 'paola@scuola.hk', phone: '+852 1234', notes: 'Note test',
+    }, db);
+    expect(id).toBeGreaterThan(0);
+    const c = customersDb.getCustomerById(id, db);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('Scuola Italiana HK');
+    expect(c!.email).toBe('paola@scuola.hk');
+    expect(c!.contact_person).toBe('Paola B.');
   });
 
-  it('should get all customers ordered by name', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO customers (name, created_at, updated_at) VALUES (?, datetime('now'), datetime('now'))`, ['Zeta School']);
-    e(db, `INSERT INTO customers (name, created_at, updated_at) VALUES (?, datetime('now'), datetime('now'))`, ['Alpha School']);
-    e(db, `INSERT INTO customers (name, created_at, updated_at) VALUES (?, datetime('now'), datetime('now'))`, ['Beta School']);
-    
-    const all = qa(db, 'SELECT * FROM customers ORDER BY name ASC');
+  it('should get all customers ordered by name', () => {
+    customersDb.createCustomer({ name: 'Zeta School' }, db);
+    customersDb.createCustomer({ name: 'Alpha School' }, db);
+    customersDb.createCustomer({ name: 'Beta School' }, db);
+    const all = customersDb.getAllCustomers(db);
+    expect(all).toHaveLength(3);
     expect(all[0].name).toBe('Alpha School');
     expect(all[1].name).toBe('Beta School');
     expect(all[2].name).toBe('Zeta School');
-    expect(all).toHaveLength(3);
-    db.close();
   });
 
-  it('should update a customer', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO customers (name, created_at, updated_at) VALUES (?, datetime('now'), datetime('now'))`, ['School A']);
-    const row = q(db, 'SELECT id FROM customers');
-    const id = row!.id as number;
-    
-    e(db, 'UPDATE customers SET name = ?, email = ? WHERE id = ?', ['School A Updated', 'new@email.com', id]);
-    const updated = q(db, 'SELECT * FROM customers WHERE id = ?', [id]);
-    expect(updated!.name).toBe('School A Updated');
-    expect(updated!.email).toBe('new@email.com');
-    db.close();
+  it('should update a customer', () => {
+    const id = customersDb.createCustomer({ name: 'School A' }, db);
+    customersDb.updateCustomer(id, { name: 'School A Updated', email: 'new@email.com' }, db);
+    const c = customersDb.getCustomerById(id, db);
+    expect(c!.name).toBe('School A Updated');
+    expect(c!.email).toBe('new@email.com');
   });
 
-  it('should delete a customer', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO customers (name, created_at, updated_at) VALUES (?, datetime('now'), datetime('now'))`, ['To Delete']);
-    const row = q(db, 'SELECT id FROM customers');
-    const id = row!.id as number;
-    
-    e(db, 'DELETE FROM customers WHERE id = ?', [id]);
-    const after = q(db, 'SELECT * FROM customers WHERE id = ?', [id]);
-    expect(after).toBeUndefined();
-    db.close();
+  it('should delete a customer', () => {
+    const id = customersDb.createCustomer({ name: 'To Delete' }, db);
+    customersDb.deleteCustomer(id, db);
+    expect(customersDb.getCustomerById(id, db)).toBeNull();
   });
 
-  it('should search by name', async () => {
-    const db = await createTestDb();
-    e(db, `INSERT INTO customers (name, email, created_at, updated_at) VALUES (?, ?, datetime('now'), datetime('now'))`, ['Scuola Roma', 'roma@test.com']);
-    e(db, `INSERT INTO customers (name, email, created_at, updated_at) VALUES (?, ?, datetime('now'), datetime('now'))`, ['Scuola Milano', 'milano@test.com']);
-    e(db, `INSERT INTO customers (name, email, created_at, updated_at) VALUES (?, ?, datetime('now'), datetime('now'))`, ['Liceo Torino', 'torino@test.com']);
-    
-    const results = qa(db, 'SELECT * FROM customers WHERE name LIKE ? ORDER BY name ASC', ['%Roma%']);
+  it('should search by name', () => {
+    customersDb.createCustomer({ name: 'Scuola Roma', email: 'roma@test.com' }, db);
+    customersDb.createCustomer({ name: 'Scuola Milano', email: 'milano@test.com' }, db);
+    customersDb.createCustomer({ name: 'Liceo Torino', email: 'torino@test.com' }, db);
+    const results = customersDb.searchCustomers('Roma', db);
     expect(results).toHaveLength(1);
     expect(results[0].name).toBe('Scuola Roma');
-    db.close();
   });
 });

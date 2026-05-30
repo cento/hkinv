@@ -1,40 +1,51 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, lazy, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
+import { CssBaseline, CircularProgress, Box } from '@mui/material';
 import { useAppContext } from './contexts/AppContext';
 import { getTheme } from './theme';
 import Layout from './components/Layout';
 import WelcomePage from './pages/WelcomePage';
-import DashboardPage from './pages/DashboardPage';
-import InvoicesPage from './pages/InvoicesPage';
-import InvoiceEditPage from './pages/InvoiceEditPage';
-import CustomersPage from './pages/CustomersPage';
-import CustomerDetailPage from './pages/CustomerDetailPage';
-import ServiceTypesPage from './pages/ServiceTypesPage';
-import SettingsPage from './pages/SettingsPage';
+
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const InvoicesPage = lazy(() => import('./pages/InvoicesPage'));
+const InvoiceEditPage = lazy(() => import('./pages/InvoiceEditPage'));
+const CustomersPage = lazy(() => import('./pages/CustomersPage'));
+const CustomerDetailPage = lazy(() => import('./pages/CustomerDetailPage'));
+const ServiceTypesPage = lazy(() => import('./pages/ServiceTypesPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+
+function PageLoader() {
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
+      <CircularProgress />
+    </Box>
+  );
+}
 
 function AppRoutes() {
   const { state } = useAppContext();
 
-  // If no DB is open, just show the welcome page without layout
   if (!state.isDbOpen) {
     return <WelcomePage />;
   }
 
   return (
     <Layout>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/invoices" element={<InvoicesPage />} />
-        <Route path="/invoices/new" element={<InvoiceEditPage />} />
-        <Route path="/invoices/:id" element={<InvoiceEditPage />} />
-        <Route path="/customers" element={<CustomersPage />} />
-        <Route path="/customers/:id" element={<CustomerDetailPage />} />
-        <Route path="/service-types" element={<ServiceTypesPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/invoices/new" element={<InvoiceEditPage />} />
+          <Route path="/invoices/:id/edit" element={<InvoiceEditPage />} />
+          <Route path="/invoices/:id" element={<InvoiceEditPage />} />
+          <Route path="/customers" element={<CustomersPage />} />
+          <Route path="/customers/:id" element={<CustomerDetailPage />} />
+          <Route path="/service-types" element={<ServiceTypesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </Suspense>
     </Layout>
   );
 }

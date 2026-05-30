@@ -7,6 +7,15 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     target: 'esnext',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-mui': ['@mui/material', '@mui/icons-material', '@mui/x-data-grid'],
+          'vendor-pdf': ['jspdf', 'jspdf-autotable'],
+        },
+      },
+    },
   },
   server: {
     port: 5173,
