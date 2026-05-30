@@ -34,9 +34,9 @@ export default function CustomersPage() {
   const handleSave = async (data: CustomerFormData) => {
     try {
       if (editCustomer) {
-        await api.customersUpdate(editCustomer.id, data as unknown as Record<string, unknown>);
+        await api.customersUpdate(editCustomer.id, data);
       } else {
-        await api.customersCreate(data as unknown as Record<string, unknown>);
+        await api.customersCreate(data);
       }
       setDialogOpen(false);
       setEditCustomer(null);

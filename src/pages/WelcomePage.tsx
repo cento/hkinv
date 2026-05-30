@@ -12,6 +12,7 @@ import { openHKINVFile, configureBackupLocation, storeBackupHandle, getStoredBac
 import { hasSettings } from '../database/settings';
 import { runMigrations } from '../database/migrations';
 import { startBackupTimer } from '../database/backup';
+import OnboardingWizard from '../components/OnboardingWizard';
 
 const RECENT_KEY = 'recent-archives';
 const MAX_RECENT = 5;
@@ -35,6 +36,7 @@ export default function WelcomePage() {
   const [hasDB, setHasDB] = useState(false);
   const [recent, setRecent] = useState<{ name: string; lastOpened: string }[]>([]);
   const [activeArchive, setActiveArchive] = useState<string | null>(null);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   useEffect(() => {
     hasExistingDB().then(setHasDB);
@@ -213,6 +215,8 @@ export default function WelcomePage() {
           {t('welcome.createNew')}
         </Typography>
       </Paper>
+
+      <OnboardingWizard open={onboardingOpen} onFinish={() => setOnboardingOpen(false)} />
 
       <Snackbar open={toast.open} autoHideDuration={4000}
         onClose={() => setToast(t => ({ ...t, open: false }))}>

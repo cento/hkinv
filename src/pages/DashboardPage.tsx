@@ -8,6 +8,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import api from '../services/dbService';
+import { EmptyState } from '../components/ConfirmDialog';
 
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color?: string }) {
   return (
@@ -36,7 +37,7 @@ export default function DashboardPage() {
     customerCount: 0,
   });
   const [overdueInvoices, setOverdueInvoices] = useState<Record<string, any>[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const loadStats = useCallback(async () => {
     try {
@@ -110,6 +111,16 @@ export default function DashboardPage() {
           <StatCard icon={<ReceiptLongIcon />} label={t('invoices.paid')} value={stats.totalPaid} color="success.main" />
         </Grid>
       </Grid>
+
+      {!loading && stats.totalInvoices === 0 && (
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <EmptyState
+            message={t('dashboard.emptyMessage') || 'No invoices yet. Create your first invoice to get started!'}
+            actionLabel={t('invoices.new')}
+            onAction={() => navigate('/invoices/new')}
+          />
+        </Paper>
+      )}
 
       {overdueInvoices.length > 0 && (
         <Alert severity="warning" icon={<WarningAmberIcon />} sx={{ mb: 3 }}

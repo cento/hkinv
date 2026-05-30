@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 
 import { AppProvider } from '../../../src/contexts/AppContext';
 import WelcomePage from '../../../src/pages/WelcomePage';
@@ -18,7 +19,13 @@ vi.mock('../../../src/database/connection', () => ({
 }));
 
 function renderPage() {
-  return render(React.createElement(AppProvider, null, React.createElement(WelcomePage)));
+  return render(
+    React.createElement(AppProvider, null,
+      React.createElement(MemoryRouter, null,
+        React.createElement(WelcomePage)
+      )
+    )
+  );
 }
 
 describe('WelcomePage', () => {

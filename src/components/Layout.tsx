@@ -126,7 +126,7 @@ export default function Layout({ children }: LayoutProps) {
     };
     window.addEventListener('hkinv:backup', handler);
     return () => window.removeEventListener('hkinv:backup', handler);
-  }, []);
+  }, [t]);
 
   const menuItems = [
     { text: t('nav.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
