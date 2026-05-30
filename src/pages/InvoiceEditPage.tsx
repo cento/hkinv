@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Button, Paper, Grid, TextField, Select, MenuItem,
   FormControl, InputLabel, Snackbar, Alert, Autocomplete, Divider, Dialog,
-  DialogTitle, DialogContent, DialogActions
+  DialogTitle, DialogContent, DialogActions, Backdrop, CircularProgress
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
@@ -16,6 +16,7 @@ import InvoiceItemsTable, { InvoiceItemRow } from '../components/InvoiceItemsTab
 import { formatDateISO, calculateDueDate } from '../utils/format';
 import { validateInvoice } from '../utils/validators';
 import ConfirmDialog from '../components/ConfirmDialog';
+import PDFPreviewDialog from '../components/PDFPreviewDialog';
 import { downloadBlob } from '../database/fsa';
 
 export default function InvoiceEditPage() {
@@ -45,6 +46,7 @@ export default function InvoiceEditPage() {
   const [existingInvoice, setExistingInvoice] = useState<Record<string, any> | null>(null);
   const [discardDialog, setDiscardDialog] = useState(false);
   const [reviewDialog, setReviewDialog] = useState(false);
+  const [previewPdfData, setPreviewPdfData] = useState<string | null>(null);
   const [pendingSaveStatus, setPendingSaveStatus] = useState<string>('draft');
   const [templateReady, setTemplateReady] = useState(false);
   const [dataReady, setDataReady] = useState(false);
@@ -54,27 +56,29 @@ export default function InvoiceEditPage() {
 
   // Load data
   useEffect(() => {
-    api.customersGetAll().then(c => setCustomers(c as any[])).catch(console.error);
-    api.settingsGet().then(s => {
-      const cfg = s as Record<string, any> | null;
-      setSettings(cfg);
-      if (cfg) {
-        setPaymentTerms(cfg.default_payment_terms || '');
-        setDueDate(calculateDueDate(cfg.default_payment_terms));
+    setLoading(true);
+    Promise.all([
+      api.customersGetAll(),
+      api.settingsGet(),
+      isNew ? api.settingsGenerateInvoiceNumber() : Promise.resolve(null),
+    ]).then(([cust, cfg, invNum]) => {
+      setCustomers(cust as any[]);
+      const s = cfg as Record<string, any> | null;
+      setSettings(s);
+      if (s) {
+        setPaymentTerms(s.default_payment_terms || '');
+        setDueDate(calculateDueDate(s.default_payment_terms));
       }
-    }).catch(console.error);
-    if (isNew) {
-      api.settingsGenerateInvoiceNumber().then(num => {
-        if (!invoiceNumberEdited.current) {
-          setInvoiceNumber(num);
-        }
-      }).catch(console.error);
-    }
+      if (isNew && invNum && !invoiceNumberEdited.current) {
+        setInvoiceNumber(invNum as string);
+      }
+    }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
   // Load existing invoice for editing
   useEffect(() => {
     if (!invoiceId) return;
+    setLoading(true);
     (async () => {
       try {
         const inv = (await api.invoicesGetById(invoiceId)) as Record<string, any> | null;
@@ -103,6 +107,8 @@ export default function InvoiceEditPage() {
         setDataReady(true);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     })();
   }, [invoiceId]);
@@ -298,7 +304,7 @@ export default function InvoiceEditPage() {
     }
   };
 
-  const handleExportPDF = async () => {
+  const handleExportPDF = async (download = true) => {
     if (!existingInvoice && !invoiceId) return;
     try {
       const inv = (existingInvoice || await api.invoicesGetById(invoiceId!)) as Record<string, any> | null;
@@ -337,9 +343,13 @@ export default function InvoiceEditPage() {
         language: (localStorage.getItem('app-language') || 'it') as 'it' | 'en',
       });
 
-      const blob = doc.output('blob');
-      downloadBlob(blob, `${inv.invoice_number}.pdf`);
-      setToast({ open: true, message: 'PDF ' + t('common.save') + ' ✓', severity: 'success' });
+      if (download) {
+        const blob = doc.output('blob');
+        downloadBlob(blob, `${inv.invoice_number}.pdf`);
+        setToast({ open: true, message: 'PDF ' + t('common.save') + ' ✓', severity: 'success' });
+      } else {
+        setPreviewPdfData(doc.output('datauristring'));
+      }
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
@@ -438,7 +448,7 @@ export default function InvoiceEditPage() {
   const total = subtotal - discountAmount;
 
   return (
-    <Box sx={{ maxWidth: 1100 }}>
+    <Box sx={{ maxWidth: 1100, position: 'relative' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
         <Button startIcon={<ArrowBackIcon />} onClick={() => {
           if (isDirty) {
@@ -460,7 +470,10 @@ export default function InvoiceEditPage() {
             <Button startIcon={<ContentCopyIcon />} onClick={handleDuplicate}>
               {t('common.duplicate')}
             </Button>
-            <Button startIcon={<PictureAsPdfIcon />} onClick={handleExportPDF}>
+            <Button startIcon={<PictureAsPdfIcon />} onClick={() => handleExportPDF(false)}>
+              {t('common.preview')}
+            </Button>
+            <Button startIcon={<PictureAsPdfIcon />} onClick={() => handleExportPDF(true)}>
               {t('invoices.exportPdf')}
             </Button>
           </>
@@ -639,6 +652,20 @@ export default function InvoiceEditPage() {
         onClose={() => setToast(t => ({ ...t, open: false }))}>
         <Alert severity={toast.severity} variant="filled">{toast.message}</Alert>
       </Snackbar>
+
+      <PDFPreviewDialog
+        open={!!previewPdfData}
+        onClose={() => setPreviewPdfData(null)}
+        pdfData={previewPdfData}
+        fileName={existingInvoice ? `${existingInvoice.invoice_number}.pdf` : 'invoice.pdf'}
+      />
+
+      <Backdrop
+        open={loading || saving}
+        sx={{ position: 'absolute', zIndex: 1, borderRadius: 1 }}
+      >
+        <CircularProgress />
+      </Backdrop>
     </Box>
   );
 }

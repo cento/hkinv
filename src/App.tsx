@@ -1,10 +1,11 @@
 import React, { useMemo, lazy, Suspense } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, CircularProgress, Box } from '@mui/material';
 import { useAppContext } from './contexts/AppContext';
 import { getTheme } from './theme';
 import Layout from './components/Layout';
+import ErrorBoundary from './components/ErrorBoundary';
 import WelcomePage from './pages/WelcomePage';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
@@ -13,6 +14,8 @@ const InvoiceEditPage = lazy(() => import('./pages/InvoiceEditPage'));
 const CustomersPage = lazy(() => import('./pages/CustomersPage'));
 const CustomerDetailPage = lazy(() => import('./pages/CustomerDetailPage'));
 const ServiceTypesPage = lazy(() => import('./pages/ServiceTypesPage'));
+const TaxReportsPage = lazy(() => import('./pages/TaxReportsPage'));
+const CloudBackupPage = lazy(() => import('./pages/CloudBackupPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 function PageLoader() {
@@ -25,6 +28,7 @@ function PageLoader() {
 
 function AppRoutes() {
   const { state } = useAppContext();
+  const location = useLocation();
 
   if (!state.isDbOpen) {
     return <WelcomePage />;
@@ -32,8 +36,9 @@ function AppRoutes() {
 
   return (
     <Layout>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
+      <ErrorBoundary key={location.pathname}>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
@@ -43,9 +48,12 @@ function AppRoutes() {
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/customers/:id" element={<CustomerDetailPage />} />
           <Route path="/service-types" element={<ServiceTypesPage />} />
+          <Route path="/tax-reports" element={<TaxReportsPage />} />
+          <Route path="/cloud-backup" element={<CloudBackupPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </Suspense>
+      </ErrorBoundary>
     </Layout>
   );
 }

@@ -23,6 +23,7 @@ import {
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -30,6 +31,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import BackupIcon from '@mui/icons-material/Backup';
 import SaveIcon from '@mui/icons-material/Save';
+import CloudIcon from '@mui/icons-material/Cloud';
 import { useAppContext } from '../contexts/AppContext';
 import { changeLanguage } from '../i18n/index';
 import { isBackupConfigured, getBackupFileName, getLastBackupTime, triggerBackup } from '../database/backup';
@@ -61,6 +63,17 @@ function BackupIndicator() {
       if (ok) {
         result = await triggerBackup(true);
       }
+    }
+    if (!result) {
+      try {
+        const { getDatabase } = await import('../database/connection');
+        const db = getDatabase();
+        const data = new Uint8Array(db.export());
+        const blob = new Blob([data], { type: 'application/octet-stream' });
+        const { downloadBlob } = await import('../database/fsa');
+        const fName = getBackupFileName() || `hkinv-backup-${new Date().toISOString().split('T')[0]}.hkinv`;
+        downloadBlob(blob, fName);
+      } catch {}
     }
   };
 
@@ -120,6 +133,8 @@ export default function Layout({ children }: LayoutProps) {
     { text: t('nav.invoices'), icon: <ReceiptLongIcon />, path: '/invoices' },
     { text: t('nav.customers'), icon: <PeopleIcon />, path: '/customers' },
     { text: t('nav.serviceTypes'), icon: <LocalOfferIcon />, path: '/service-types' },
+    { text: t('nav.taxReports'), icon: <AssessmentIcon />, path: '/tax-reports' },
+    { text: t('nav.cloudBackup'), icon: <CloudIcon />, path: '/cloud-backup' },
     { text: t('nav.settings'), icon: <SettingsIcon />, path: '/settings' },
   ];
 

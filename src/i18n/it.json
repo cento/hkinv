@@ -25,6 +25,7 @@
   "common.print": "Stampa",
   "common.review": "Riepilogo",
   "common.confirmSave": "Conferma e salva",
+  "common.preview": "Anteprima",
   "invoices.noInvoices": "Nessuna fattura trovata. Creane una nuova per iniziare!",
   "customers.noCustomers": "Nessun cliente trovato. Aggiungi il primo cliente!",
   "serviceTypes.noServices": "Nessun profilo di pagamento trovato. Creane uno nuovo!",
@@ -178,6 +179,14 @@
   "nav.serviceTypes": "Profili pagamento",
   "nav.settings": "Impostazioni",
   "nav.dashboard": "Dashboard",
+  "nav.taxReports": "Report Fiscali",
+  "nav.cloudBackup": "Backup Cloud",
+
+  "pdf.taxReport": "Report Fiscale",
+  "pdf.period": "Periodo",
+  "pdf.year": "Anno Fiscale",
+  "pdf.annual": "Annuale",
+  "pdf.quarterly": "Trimestrale",
 
   "dashboard.title": "Dashboard",
   "dashboard.totalInvoices": "Totale fatture",
@@ -192,5 +201,20 @@
   "validation.br": "BR Number non valido (5-25 caratteri)",
   "validation.positive": "Il valore deve essere positivo",
 
-  "wizard.paymentTermsHelp": "Es. \"30 giorni\", \"Fine mese\", \"A ricevimento fattura\""
+  "wizard.paymentTermsHelp": "Es. \"30 giorni\", \"Fine mese\", \"A ricevimento fattura\"",
+
+  "cloudBackup.title": "Backup Cloud",
+  "cloudBackup.googleDrive": "Google Drive",
+  "cloudBackup.howTo": "Come eseguire il backup su Google Drive",
+  "cloudBackup.howToDesc": "Clicca \"Salva su Drive\" qui sotto, poi scegli \"Google Drive\" dal selettore file. Il database verrà salvato come file .hkinv.",
+  "cloudBackup.autoBackup": "Backup automatico",
+  "cloudBackup.configuredTo": "Backup su: {name}",
+  "cloudBackup.notConfigured": "Non configurato",
+  "cloudBackup.lastBackup": "Ultimo backup",
+  "cloudBackup.changeLocation": "Cambia posizione",
+  "cloudBackup.setupBackup": "Configura backup",
+  "cloudBackup.saveToDrive": "Salva su Drive",
+  "cloudBackup.remove": "Rimuovi backup",
+  "cloudBackup.removed": "Posizione backup rimossa",
+  "cloudBackup.driveNote": "Suggerimento: Se hai Google Drive per Desktop installato, appare come cartella nel selettore file di Windows. Salva il file .hkinv lì e verrà sincronizzato automaticamente."
 }

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Typography, Button, Chip, Snackbar, Alert } from '@mui/material';
-import { DataGrid, GridColDef, GridRowParams, GridToolbar } from '@mui/x-data-grid';
+import { Box, Typography, Button, Chip, Snackbar, Alert, Tooltip } from '@mui/material';
+import { DataGrid, GridColDef, GridRowParams, GridRowSelectionModel, GridToolbar } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import DownloadIcon from '@mui/icons-material/Download';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/dbService';
 import InvoiceFilters, { FilterValues, defaultFilters } from '../components/InvoiceFilters';
@@ -28,6 +30,59 @@ export default function InvoicesPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<Record<string, any> | null>(null);
   const [overdueCount, setOverdueCount] = useState(0);
   const [hidePaid, setHidePaid] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<GridRowSelectionModel>([]);
+  const [selectionKey, setSelectionKey] = useState(0);
+
+  const handleBatchStatus = async (status: string) => {
+    try {
+      const ids = selectedIds;
+      setSelectionKey(k => k + 1);
+      setSelectedIds([]);
+      for (const id of ids) {
+        await api.invoicesUpdate(Number(id), { status } as any);
+        if (status === 'paid') {
+          await api.invoicesUpdate(Number(id), { paid_date: new Date().toISOString().split('T')[0] } as any);
+        }
+      }
+      setSelectedIds([]);
+      await loadInvoices();
+      setToast({ open: true, message: `${selectedIds.length} ${t('invoices.title')} → ${t(`invoices.${status}`)}`, severity: 'success' });
+    } catch (err: any) {
+      setToast({ open: true, message: String(err), severity: 'error' });
+    }
+  };
+
+  const handleBatchExport = async () => {
+    const ids = selectedIds;
+    setSelectionKey(k => k + 1);
+    setSelectedIds([]);
+    try {
+      for (const id of ids) {
+        const inv = (await api.invoicesGetById(Number(id))) as Record<string, any> | null;
+        if (!inv) continue;
+        const customer = (await api.customersGetById(inv.customer_id as number)) as Record<string, any> | null;
+        const pdfSettings = (await api.settingsGet()) as Record<string, any> | null;
+        if (!customer || !pdfSettings) continue;
+        const items = (await api.invoiceItemsGetAll(inv.id as number)) as Record<string, any>[];
+        const { generatePDF } = await import('../utils/pdf');
+        const doc = generatePDF({
+          teacherName: pdfSettings.teacher_name, teacherAddress: pdfSettings.teacher_address,
+          customerName: customer.name, customerAddress: customer.address,
+          invoiceNumber: inv.invoice_number, issueDate: inv.issue_date, dueDate: inv.due_date,
+          subtotal: inv.subtotal, discountPercent: inv.discount_percent,
+          discountAmount: inv.discount_amount, total: inv.total,
+          paymentTerms: inv.payment_terms, notes: inv.notes,
+          items: (items || []).map((i: any) => ({ description: i.description, lesson_date: i.lesson_date, hours: i.hours, rate: i.rate, amount: i.amount })),
+          language: (localStorage.getItem('app-language') || 'it') as 'it' | 'en',
+        });
+        downloadBlob(doc.output('blob'), `${inv.invoice_number}.pdf`);
+      }
+      setToast({ open: true, message: `${selectedIds.length} PDF ${t('common.save')} ✓`, severity: 'success' });
+      setSelectedIds([]);
+    } catch (err: any) {
+      setToast({ open: true, message: String(err), severity: 'error' });
+    }
+  };
 
   const loadInvoices = useCallback(async () => {
     try {
@@ -238,6 +293,27 @@ export default function InvoicesPage() {
         </Button>
       </Box>
 
+      {selectedIds.length > 0 && (
+        <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+          <Typography variant="body2" sx={{ mr: 1 }}>{selectedIds.length} selected</Typography>
+          <Tooltip title={t('invoices.paid')}>
+            <Button size="small" color="success" startIcon={<CheckCircleIcon />}
+              onClick={() => handleBatchStatus('paid')}>
+              {t('invoices.paid')}
+            </Button>
+          </Tooltip>
+          <Tooltip title={t('invoices.sent')}>
+            <Button size="small" color="primary" startIcon={<CheckCircleIcon />}
+              onClick={() => handleBatchStatus('sent')}>
+              {t('invoices.sent')}
+            </Button>
+          </Tooltip>
+          <Button size="small" startIcon={<DownloadIcon />} onClick={handleBatchExport}>
+            PDF ({selectedIds.length})
+          </Button>
+        </Box>
+      )}
+
       <InvoiceFilters
         values={filters}
         onChange={setFilters}
@@ -246,14 +322,16 @@ export default function InvoicesPage() {
 
       <Box sx={{ height: 'calc(100vh - 280px)' }}>
         <DataGrid
+          key={selectionKey}
           rows={displayedInvoices}
           columns={columns}
           loading={loading}
           pageSizeOptions={[25, 50]}
+          checkboxSelection
           disableRowSelectionOnClick
+          onRowSelectionModelChange={setSelectedIds}
           onRowDoubleClick={handleRowDoubleClick}
-          onRowClick={handleRowClick}
-          slots={{ toolbar: GridToolbar, noRowsOverlay: EmptyState }}
+          slots={{ toolbar: GridToolbar, noRowsOverlay: EmptyState, footer: () => null }}
           slotProps={{ noRowsOverlay: { message: t('invoices.noInvoices'), actionLabel: t('invoices.new'), onAction: () => navigate('/invoices/new') } as any }}
         />
       </Box>
