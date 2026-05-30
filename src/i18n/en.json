@@ -179,6 +179,13 @@
   "nav.serviceTypes": "Payment profiles",
   "nav.settings": "Settings",
   "nav.dashboard": "Dashboard",
+  "nav.taxReports": "Tax Reports",
+
+  "pdf.taxReport": "Tax Report",
+  "pdf.period": "Period",
+  "pdf.year": "Tax Year",
+  "pdf.annual": "Annual",
+  "pdf.quarterly": "Quarterly",
 
   "dashboard.title": "Dashboard",
   "dashboard.totalInvoices": "Total invoices",

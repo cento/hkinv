@@ -179,6 +179,13 @@
   "nav.serviceTypes": "Profili pagamento",
   "nav.settings": "Impostazioni",
   "nav.dashboard": "Dashboard",
+  "nav.taxReports": "Report Fiscali",
+
+  "pdf.taxReport": "Report Fiscale",
+  "pdf.period": "Periodo",
+  "pdf.year": "Anno Fiscale",
+  "pdf.annual": "Annuale",
+  "pdf.quarterly": "Trimestrale",
 
   "dashboard.title": "Dashboard",
   "dashboard.totalInvoices": "Totale fatture",

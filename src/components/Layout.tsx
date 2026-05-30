@@ -23,6 +23,7 @@ import {
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -120,6 +121,7 @@ export default function Layout({ children }: LayoutProps) {
     { text: t('nav.invoices'), icon: <ReceiptLongIcon />, path: '/invoices' },
     { text: t('nav.customers'), icon: <PeopleIcon />, path: '/customers' },
     { text: t('nav.serviceTypes'), icon: <LocalOfferIcon />, path: '/service-types' },
+    { text: t('nav.taxReports'), icon: <AssessmentIcon />, path: '/tax-reports' },
     { text: t('nav.settings'), icon: <SettingsIcon />, path: '/settings' },
   ];
 
