@@ -28,8 +28,12 @@ jobs:
 
       - run: npm run build
 
-      - name: Zip static build
-        run: zip -r hkinv-webapp.zip dist/
+      - name: Package distribution
+        run: |
+          mkdir hkinv-webapp
+          cp hkinv.bat serve.ps1 hkinv-webapp/
+          cp -r dist hkinv-webapp/
+          zip -r hkinv-webapp.zip hkinv-webapp/
 
       - uses: actions/upload-artifact@v4
         with:
