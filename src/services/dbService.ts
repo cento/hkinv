@@ -65,12 +65,18 @@ const dbService = {
   customersSearch: (query: string) => Promise.resolve(customers.searchCustomers(query)),
 
   invoicesCreate: (data: Record<string, unknown>) => {
+    if (data.invoice_number && typeof data.invoice_number === 'string' && data.invoice_number.trim()) {
+      const id = invoices.createInvoice(data as any);
+      notifySaveAll();
+      return Promise.resolve(id);
+    }
     const id = invoices.createInvoiceWithNumber(data as any);
     notifySaveAll();
     return Promise.resolve(id);
   },
   invoicesGetAll: () => Promise.resolve(invoices.getAllInvoices()),
   invoicesGetById: (id: number) => Promise.resolve(invoices.getInvoiceById(id)),
+  invoicesGetByNumber: (number: string) => Promise.resolve(invoices.getInvoiceByNumber(number)),
   invoicesUpdate: (id: number, data: Record<string, unknown>) => {
     invoices.updateInvoice(id, data as any);
     notifySaveAll();

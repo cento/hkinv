@@ -156,6 +156,13 @@ export function getInvoiceById(id: number, _db?: SqlJsDatabase): InvoiceWithCust
   return (row as unknown as InvoiceWithCustomer) || null;
 }
 
+export function getInvoiceByNumber(number: string, _db?: SqlJsDatabase): InvoiceWithCustomer | null {
+  const conn = _db || getDatabase();
+  const row = q(conn, `SELECT i.*, c.name as customer_name FROM invoices i
+    LEFT JOIN customers c ON i.customer_id = c.id WHERE i.invoice_number = ?`, [number]);
+  return (row as unknown as InvoiceWithCustomer) || null;
+}
+
 export function updateInvoice(id: number, data: Partial<InvoiceInput>, _db?: SqlJsDatabase): void {
   const conn = _db || getDatabase();
   const now = new Date().toISOString();

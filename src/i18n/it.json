@@ -140,6 +140,14 @@
   "invoices.saveDraft": "Salva Bozza",
   "invoices.saveFinal": "Salva Finale",
   "invoices.fromLastTemplate": "Dati importati dalla fattura precedente",
+  "invoices.numberAlreadyExists": "Questo numero fattura è già presente",
+
+  "welcome.firstRun": "Per iniziare, crea un nuovo archivio o aprine uno esistente.",
+  "welcome.quickGuide": "Guida rapida",
+  "welcome.stepCreate": "Crea un nuovo archivio",
+  "welcome.stepDescribe": "Verrà creato un nuovo file dove saranno salvati tutte le fatture e i clienti. Usa il pulsante Salva nella barra degli strumenti per tenere una copia di backup nella cartella Documenti.",
+  "welcome.stepOpen": "Apri un archivio esistente",
+  "welcome.stepOpenDescribe": "Cerca un file .hkinv che possiedi già. L'app importa tutti i dati nel browser e puoi configurare backup automatici.",
 
   "pdf.title": "FATTURA",
   "pdf.invoice": "FATTURA",
