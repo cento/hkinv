@@ -34,6 +34,9 @@ export default function DashboardPage() {
   const { state } = useAppContext();
   const archiveName = state.dbPath || '-';
   const backupName = isBackupConfigured() ? getBackupFileName() : null;
+  const backupMissing = !backupName;
+  const backupSameFile = backupName != null && archiveName !== '-' && backupName === archiveName;
+  const showBackupWarning = backupMissing || backupSameFile;
   const [stats, setStats] = useState<Record<string, number>>({
     totalInvoices: 0,
     totalDraft: 0,
@@ -111,6 +114,21 @@ export default function DashboardPage() {
           </Box>
         )}
       </Paper>
+
+      {showBackupWarning && (
+        <Alert
+          severity="warning"
+          sx={{ mb: 3 }}
+          action={
+            <Button size="small" color="inherit" onClick={() => navigate('/cloud-backup')}>
+              {t('dashboard.configureBackup')}
+            </Button>
+          }
+        >
+          {backupMissing && t('dashboard.backupMissing')}
+          {backupSameFile && t('dashboard.backupSameFile')}
+        </Alert>
+      )}
 
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
