@@ -52,6 +52,7 @@ function AppRoutes() {
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </Suspense>
+      </ErrorBoundary>
     </Layout>
   );
 }
