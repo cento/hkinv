@@ -220,7 +220,7 @@
   "cloudBackup.howTo": "How it works",
   "cloudBackup.howToDesc": "Choose a location for your backup file. The app auto-saves every 5 minutes. If you save inside a synced folder (Google Drive, OneDrive, Dropbox), the file syncs to the cloud automatically.",
   "cloudBackup.autoBackup": "Automatic backup",
-  "cloudBackup.configuredTo": "Backing up to: {name}",
+  "cloudBackup.configuredToLabel": "Backing up to:",
   "cloudBackup.notConfigured": "Not configured",
   "cloudBackup.lastBackup": "Last backup",
   "cloudBackup.changeLocation": "Change location",
