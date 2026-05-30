@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Typography, Container, Paper, Stack, Snackbar, Alert, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Button, Typography, Container, Paper, Stack, Snackbar, Alert, Divider, List, ListItem, ListItemIcon, ListItemText, Box } from '@mui/material';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
@@ -40,7 +40,12 @@ export default function WelcomePage() {
   useEffect(() => {
     hasExistingDB().then(setHasDB);
     setRecent(getRecentFiles());
-    setActiveArchive(getStoredBackupFileName());
+    const files = getRecentFiles();
+    if (files.length > 0) {
+      setActiveArchive(files[0].name);
+    } else {
+      setActiveArchive(getStoredBackupFileName());
+    }
   }, []);
 
   const afterDbOpen = (fileName?: string) => {
@@ -87,7 +92,9 @@ export default function WelcomePage() {
     try {
       await openDatabase();
       const backupName = getStoredBackupFileName();
-      afterDbOpen(backupName || undefined);
+      const recentFiles = getRecentFiles();
+      const archiveName = backupName || (recentFiles.length > 0 ? recentFiles[0].name : undefined);
+      afterDbOpen(archiveName);
     } catch (err: any) {
       setToast({ open: true, message: t('common.error') + ': ' + String(err), severity: 'error' });
     }
@@ -109,6 +116,10 @@ export default function WelcomePage() {
         </Typography>
         <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 4 }}>
           {t('app.subtitle')}
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontStyle: 'italic' }}>
+          {t('welcome.firstRun')}
         </Typography>
 
         <Stack spacing={2}>
@@ -139,7 +150,7 @@ export default function WelcomePage() {
               sx={{ px: 4, py: 1.5, textTransform: 'none' }}
               color="inherit"
             >
-              Continue with{activeArchive ? ` ${activeArchive}` : t('welcome.continueExisting')}
+              {activeArchive ? `${t('welcome.continueWith')} ${activeArchive}` : t('welcome.continueExisting')}
             </Button>
           )}
         </Stack>
@@ -155,6 +166,26 @@ export default function WelcomePage() {
             {t('welcome.setBackup')}
           </Button>
         )}
+
+        <Box sx={{ mt: 4, textAlign: 'left' }}>
+          <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+            {t('welcome.quickGuide')}
+          </Typography>
+          <Stack spacing={1.5}>
+            <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'action.hover' }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>1. {t('welcome.stepCreate')}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('welcome.stepDescribe')}
+              </Typography>
+            </Paper>
+            <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'action.hover' }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>2. {t('welcome.stepOpen')}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('welcome.stepOpenDescribe')}
+              </Typography>
+            </Paper>
+          </Stack>
+        </Box>
 
         {recent.length > 0 && (
           <>

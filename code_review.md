@@ -242,4 +242,52 @@ Recurring invoices, email send, payment reminders, tax reports, multi-currency, 
 
 ## 📋 PRIORITY
 
-All bugs fixed. All architecture improvements and code quality upgrades applied. Most UX items done. Remaining work: onboarding (27), Error Boundary (30), loading states (31), keyboard shortcuts (40), invoice items validation (37), error states (38), and features 45-55.
+All bugs fixed. All architecture improvements and code quality upgrades applied. Most UX items done. Remaining work: onboarding (30), Error Boundary (31), loading states (32), keyboard shortcuts (41), invoice items validation (37), error states (39), and features 45-55 below.
+
+---
+
+## 🟣 NEW FEATURES
+
+### 45. Recurring invoices
+Auto-generate invoices on a schedule for the same students/schools each month. Add `recurring` flag and `interval` to schema. Generate drafts for the current period based on previous month's template.
+*Value: eliminates monthly manual work.*
+
+### 46. Direct email send
+Pre-fill email client with PDF attachment via `mailto:` link with subject/body. Optional SMTP config in settings.
+*Value: 4-step export workflow → 1 click.*
+
+### 47. Payment reminders
+Templates for overdue invoice reminders (polite → firm). Badge in sidebar for overdue count.
+*Value: solves the #1 freelancer pain point.*
+
+### 48. Tax reports (HK Salaries Tax)
+Annual/quarterly income summary for HK tax year (Apr 1 – Mar 31). Exportable CSV/PDF. Filter by `paid_date`.
+*Value: saves hours of spreadsheet work at tax time.*
+
+### 49. Multi-currency support
+USD, EUR, CNY in addition to HKD. Exchange rate settings. HKD-equivalent totals on dashboard.
+*Value: international schools increasingly pay in non-HKD currencies.*
+
+### 50. Lesson / hours tracking
+Calendar-based lesson log: date, duration, customer, service type. Import into invoices automatically.
+*Value: bridges the biggest workflow gap — lessons tracked separately and manually transferred to invoices.*
+
+### 51. Command palette (Cmd+K)
+Fuzzy search across invoices and customers. Instant navigation. Power-user pattern.
+*Value: speed and discoverability.*
+
+### 52. Inline PDF preview
+Render PDF in a dialog before exporting. Use `pdf.js` or canvas from jsPDF output.
+*Value: confidence before sending.*
+
+### 53. Batch operations
+Select multiple invoices, mark as paid, export PDFs, or send reminders in bulk.
+*Value: month-end efficiency.*
+
+### 54. Data import from CSV/Excel
+Import customers and past invoices with column mapping UI and validation.
+*Value: migration path from spreadsheet-based invoicing.*
+
+### 55. Cloud backup
+Google Drive / Dropbox / OneDrive sync. OAuth integration. Survives device loss.
+*Value: data safety without manual file management.*

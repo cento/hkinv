@@ -36,7 +36,7 @@
 
   "welcome.lastOpened": "Last opened archive",
   "welcome.createNew": "Create a new invoice archive to get started",
-  "welcome.continueWith": "Continue with {archive}",
+  "welcome.continueWith": "Continue with",
   "welcome.continueExisting": "Continue with existing archive",
   "welcome.setBackup": "Set backup location",
   "welcome.backupConfigured": "Backup location configured ✓",
@@ -140,6 +140,14 @@
   "invoices.saveDraft": "Save Draft",
   "invoices.saveFinal": "Save Final",
   "invoices.fromLastTemplate": "Data loaded from previous invoice",
+  "invoices.numberAlreadyExists": "This invoice number already exists",
+
+  "welcome.firstRun": "To get started, create a new archive or open an existing one.",
+  "welcome.quickGuide": "Quick guide",
+  "welcome.stepCreate": "Create a new archive",
+  "welcome.stepDescribe": "This will create a new file where all your invoices and customers are stored. Use the Save button in the toolbar to keep a backup copy in your Documents folder.",
+  "welcome.stepOpen": "Open an existing archive",
+  "welcome.stepOpenDescribe": "Browse for a .hkinv file you already have. The app will import all data into the browser and you can set up automatic backups.",
 
   "pdf.title": "INVOICE",
   "pdf.invoice": "INVOICE",

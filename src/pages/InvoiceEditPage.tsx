@@ -41,6 +41,7 @@ export default function InvoiceEditPage() {
   const [notes, setNotes] = useState<string>('');
   const [items, setItems] = useState<InvoiceItemRow[]>([]);
   const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [invoiceNumberError, setInvoiceNumberError] = useState('');
   const [existingInvoice, setExistingInvoice] = useState<Record<string, any> | null>(null);
   const [discardDialog, setDiscardDialog] = useState(false);
   const [reviewDialog, setReviewDialog] = useState(false);
@@ -49,6 +50,7 @@ export default function InvoiceEditPage() {
   const [dataReady, setDataReady] = useState(false);
   const initialFormRef = useRef<{ customerId: number | null; issueDate: string; dueDate: string; status: string; discountPercent: number; paymentTerms: string; notes: string; items: InvoiceItemRow[] } | null>(null);
   const dataReadyRef = useRef(false);
+  const invoiceNumberEdited = useRef(false);
 
   // Load data
   useEffect(() => {
@@ -62,7 +64,11 @@ export default function InvoiceEditPage() {
       }
     }).catch(console.error);
     if (isNew) {
-      api.settingsGenerateInvoiceNumber().then(setInvoiceNumber).catch(console.error);
+      api.settingsGenerateInvoiceNumber().then(num => {
+        if (!invoiceNumberEdited.current) {
+          setInvoiceNumber(num);
+        }
+      }).catch(console.error);
     }
   }, []);
 
@@ -203,10 +209,24 @@ export default function InvoiceEditPage() {
 
     try {
       setSaving(true);
+      setInvoiceNumberError('');
+
+      // Check for duplicate invoice number
+      if (invoiceNumber.trim()) {
+        const existing = await api.invoicesGetByNumber(invoiceNumber.trim()) as Record<string, any> | null;
+        if (existing && existing.id !== (existingInvoice?.id || null)) {
+          setInvoiceNumberError(t('invoices.numberAlreadyExists') || 'This invoice number already exists');
+          setSaving(false);
+          return;
+        }
+      }
 
       if (existingInvoice) {
         // Update existing
         const updateData: Record<string, unknown> = { ...data, status: finalStatus };
+        if (invoiceNumber.trim() && invoiceNumber.trim() !== existingInvoice.invoice_number) {
+          updateData.invoice_number = invoiceNumber.trim();
+        }
         if (finalStatus === 'paid') {
           updateData.paid_date = new Date().toISOString().split('T')[0];
         } else if (existingInvoice.status === 'paid' && finalStatus !== 'paid') {
@@ -451,16 +471,17 @@ export default function InvoiceEditPage() {
         {/* Left column: metadata */}
         <Grid size={{ xs: 12, md: 5 }}>
           <Paper sx={{ p: 2 }}>
-            {isNew && (
-              <TextField
-                fullWidth
-                label={t('invoices.number')}
-                value={invoiceNumber || '...'}
-                size="small"
-                sx={{ mb: 2 }}
-                slotProps={{ input: { readOnly: true }, inputLabel: { shrink: true } }}
-              />
-            )}
+            <TextField
+              fullWidth
+              label={t('invoices.number')}
+              value={invoiceNumber || ''}
+              onChange={e => { setInvoiceNumber(e.target.value); setInvoiceNumberError(''); invoiceNumberEdited.current = true; }}
+              size="small"
+              sx={{ mb: 2 }}
+              error={!!invoiceNumberError}
+              helperText={invoiceNumberError || ''}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
             <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>{t('invoices.customer')}</Typography>
             <Autocomplete
               options={customers}

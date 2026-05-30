@@ -1,6 +1,19 @@
 # Changelog
 
-## v0.1.1 (2026-05-30)
+## v0.1.3 (2026-05-30)
+
+### Bug Fixes
+- **Continue with button**: fixed double text and interpolation issue; shows the most recent archive filename from history
+- **Invoice number field**: no longer overwritten by auto-generated number when user has already typed manually
+- **Invoice number auto-generated**: respects user edits — won't overwrite if user already typed a custom number
+
+### UI Polish
+- **First-run guidance**: WelcomePage shows a quick guide explaining how to create/open an archive
+- **Continue with button**: shows the actual archive filename (most recent from history or backup name)
+
+---
+
+## v0.1.2 (2026-05-30)
 
 ### Bug Fixes
 - **Backup indicator now works**: toolbar correctly shows when backup is configured (was reading wrong localStorage key)

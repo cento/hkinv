@@ -81,6 +81,7 @@ vi.mock('../../src/services/dbService', () => ({
     invoicesCreate: () => Promise.resolve(1),
     invoicesGetAll: () => Promise.resolve([]),
     invoicesGetById: () => Promise.resolve(null),
+    invoicesGetByNumber: () => Promise.resolve(null),
     invoicesUpdate: () => Promise.resolve({ success: true }),
     invoicesDelete: () => Promise.resolve({ success: true }),
     invoicesSearch: () => Promise.resolve([]),
