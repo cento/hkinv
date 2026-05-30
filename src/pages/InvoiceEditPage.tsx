@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Button, Paper, Grid, TextField, Select, MenuItem,
   FormControl, InputLabel, Snackbar, Alert, Autocomplete, Divider, Dialog,
-  DialogTitle, DialogContent, DialogActions
+  DialogTitle, DialogContent, DialogActions, Backdrop, CircularProgress
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
@@ -56,27 +56,29 @@ export default function InvoiceEditPage() {
 
   // Load data
   useEffect(() => {
-    api.customersGetAll().then(c => setCustomers(c as any[])).catch(console.error);
-    api.settingsGet().then(s => {
-      const cfg = s as Record<string, any> | null;
-      setSettings(cfg);
-      if (cfg) {
-        setPaymentTerms(cfg.default_payment_terms || '');
-        setDueDate(calculateDueDate(cfg.default_payment_terms));
+    setLoading(true);
+    Promise.all([
+      api.customersGetAll(),
+      api.settingsGet(),
+      isNew ? api.settingsGenerateInvoiceNumber() : Promise.resolve(null),
+    ]).then(([cust, cfg, invNum]) => {
+      setCustomers(cust as any[]);
+      const s = cfg as Record<string, any> | null;
+      setSettings(s);
+      if (s) {
+        setPaymentTerms(s.default_payment_terms || '');
+        setDueDate(calculateDueDate(s.default_payment_terms));
       }
-    }).catch(console.error);
-    if (isNew) {
-      api.settingsGenerateInvoiceNumber().then(num => {
-        if (!invoiceNumberEdited.current) {
-          setInvoiceNumber(num);
-        }
-      }).catch(console.error);
-    }
+      if (isNew && invNum && !invoiceNumberEdited.current) {
+        setInvoiceNumber(invNum as string);
+      }
+    }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
   // Load existing invoice for editing
   useEffect(() => {
     if (!invoiceId) return;
+    setLoading(true);
     (async () => {
       try {
         const inv = (await api.invoicesGetById(invoiceId)) as Record<string, any> | null;
@@ -105,6 +107,8 @@ export default function InvoiceEditPage() {
         setDataReady(true);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     })();
   }, [invoiceId]);
@@ -444,7 +448,7 @@ export default function InvoiceEditPage() {
   const total = subtotal - discountAmount;
 
   return (
-    <Box sx={{ maxWidth: 1100 }}>
+    <Box sx={{ maxWidth: 1100, position: 'relative' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
         <Button startIcon={<ArrowBackIcon />} onClick={() => {
           if (isDirty) {
@@ -655,6 +659,13 @@ export default function InvoiceEditPage() {
         pdfData={previewPdfData}
         fileName={existingInvoice ? `${existingInvoice.invoice_number}.pdf` : 'invoice.pdf'}
       />
+
+      <Backdrop
+        open={loading || saving}
+        sx={{ position: 'absolute', zIndex: 1, borderRadius: 1 }}
+      >
+        <CircularProgress />
+      </Backdrop>
     </Box>
   );
 }
