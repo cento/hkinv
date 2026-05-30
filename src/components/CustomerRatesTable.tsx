@@ -9,6 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import api from '../services/dbService';
+import ConfirmDialog from './ConfirmDialog';
 
 interface Props {
   customerId: number;
@@ -31,6 +32,7 @@ export default function CustomerRatesTable({ customerId }: Props) {
   const [customRate, setCustomRate] = useState('');
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
   useEffect(() => {
     loadData();
@@ -67,10 +69,17 @@ export default function CustomerRatesTable({ customerId }: Props) {
   };
 
   const handleDelete = async (id: number) => {
+    setDeleteConfirm(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteConfirm === null) return;
     try {
-      await api.customerRatesDelete(id);
+      await api.customerRatesDelete(deleteConfirm);
+      setDeleteConfirm(null);
       await loadData();
     } catch (err: any) {
+      setDeleteConfirm(null);
       setToast({ open: true, message: String(err), severity: 'error' });
     }
   };
@@ -102,7 +111,7 @@ export default function CustomerRatesTable({ customerId }: Props) {
                   <TableCell>{rate.service_name}</TableCell>
                   <TableCell align="right">{rate.custom_rate.toFixed(2)} HKD</TableCell>
                   <TableCell align="center">
-                    <IconButton size="small" color="error" onClick={() => handleDelete(rate.id)}>
+                    <IconButton size="small" color="error" onClick={() => handleDelete(rate.id)} aria-label={t('common.delete')}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
@@ -138,6 +147,17 @@ export default function CustomerRatesTable({ customerId }: Props) {
       <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast(t => ({ ...t, open: false }))}>
         <Alert severity={toast.severity} variant="filled">{toast.message}</Alert>
       </Snackbar>
+
+      <ConfirmDialog
+        open={deleteConfirm !== null}
+        title={t('common.delete')}
+        message={t('customerRates.deleteConfirm') || 'Delete this custom rate?'}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
+        confirmColor="error"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteConfirm(null)}
+      />
     </Box>
   );
 }

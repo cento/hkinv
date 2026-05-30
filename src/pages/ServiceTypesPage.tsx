@@ -102,7 +102,7 @@ export default function ServiceTypesPage() {
         </Button>
       </Box>
 
-      <Box sx={{ height: 500 }}>
+      <Box sx={{ height: 'calc(100vh - 280px)' }}>
         <DataGrid
           rows={services}
           columns={columns}

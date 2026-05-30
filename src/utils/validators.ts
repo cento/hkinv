@@ -43,8 +43,13 @@ export function validateSettings(data: Record<string, any>): ValidationResult {
 }
 
 /**
- * Validates customer data.
+ * Format an error for user-friendly display.
  */
+export function formatError(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === 'string') return err;
+  try { return JSON.stringify(err); } catch { return String(err); }
+}
 export function validateCustomer(data: Record<string, any>): ValidationResult {
   const errors: ValidationError[] = [];
 

@@ -39,9 +39,12 @@ export default function CustomerDialog({ open, onClose, onSave, initial }: Props
     if (e.target.value.trim()) setErrors(e => ({ ...e, [field]: false }));
   };
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const handleSave = () => {
     const newErrors: Record<string, boolean> = {};
     if (!form.name.trim()) newErrors.name = true;
+    if (form.email.trim() && !emailRegex.test(form.email)) newErrors.email = true;
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
     onSave(form);
@@ -67,7 +70,8 @@ export default function CustomerDialog({ open, onClose, onSave, initial }: Props
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField fullWidth label={t('customers.email')} value={form.email}
-              onChange={handleChange('email')} type="email" />
+              onChange={handleChange('email')} type="email"
+              error={errors.email} helperText={errors.email ? t('validation.email') : ''} />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField fullWidth label={t('customers.phone')} value={form.phone}

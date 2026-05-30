@@ -160,6 +160,10 @@ export default function InvoicesPage() {
     navigate(`/invoices/${params.id}`);
   };
 
+  const handleRowClick = (params: GridRowParams) => {
+    navigate(`/invoices/${params.id}`);
+  };
+
   const columns: GridColDef[] = [
     { field: 'invoice_number', headerName: t('invoices.number'), flex: 1.5, minWidth: 120 },
     { field: 'customer_name', headerName: t('invoices.customer'), flex: 1.5, minWidth: 120 },
@@ -184,19 +188,19 @@ export default function InvoicesPage() {
       field: 'actions', headerName: '', flex: 1.2, minWidth: 240, sortable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5 }}>
-          <Button size="small" onClick={(e) => {
+          <Button size="small" aria-label={`${t('invoices.exportPdf')} ${params.row.invoice_number}`} onClick={(e) => {
             e.stopPropagation();
             handleExportPDF(params.row);
           }}>
             {t('invoices.exportPdf')}
           </Button>
-          <Button size="small" onClick={(e) => {
+          <Button size="small" aria-label={`Export CSV ${params.row.invoice_number}`} onClick={(e) => {
             e.stopPropagation();
             handleExportCSV(params.row);
           }}>
             CSV
           </Button>
-          <Button size="small" color="error" onClick={(e) => {
+          <Button size="small" color="error" aria-label={`${t('common.delete')} ${params.row.invoice_number}`} onClick={(e) => {
             e.stopPropagation();
             setDeleteConfirm(params.row);
           }}>
@@ -240,7 +244,7 @@ export default function InvoicesPage() {
         customers={customers as { id: number; name: string }[]}
       />
 
-      <Box sx={{ height: 500 }}>
+      <Box sx={{ height: 'calc(100vh - 280px)' }}>
         <DataGrid
           rows={displayedInvoices}
           columns={columns}
@@ -248,6 +252,7 @@ export default function InvoicesPage() {
           pageSizeOptions={[25, 50]}
           disableRowSelectionOnClick
           onRowDoubleClick={handleRowDoubleClick}
+          onRowClick={handleRowClick}
           slots={{ toolbar: GridToolbar, noRowsOverlay: EmptyState }}
           slotProps={{ noRowsOverlay: { message: t('invoices.noInvoices'), actionLabel: t('invoices.new'), onAction: () => navigate('/invoices/new') } as any }}
         />

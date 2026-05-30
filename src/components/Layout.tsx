@@ -78,6 +78,7 @@ function BackupIndicator() {
             color="success"
             onClick={handleBackupNow}
             sx={{ opacity: 0.8 }}
+            aria-label={title}
           >
             <BackupIcon fontSize="small" />
           </IconButton>
@@ -166,7 +167,7 @@ export default function Layout({ children }: LayoutProps) {
         </ToggleButtonGroup>
       </Box>
       <Box sx={{ p: '0 16px 16px', display: 'flex', justifyContent: 'center' }}>
-        <IconButton onClick={toggleDarkMode} size="small" color="inherit">
+        <IconButton onClick={toggleDarkMode} size="small" color="inherit" aria-label={t('settings.darkMode')}>
           {state.isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
         </IconButton>
       </Box>
@@ -175,6 +176,13 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <Box sx={{ display: 'flex' }}>
+      <Box component="a" href="#main-content" sx={{
+        position: 'absolute', left: -9999, zIndex: 9999,
+        '&:focus': { left: 16, top: 80, bgcolor: 'background.paper', p: 1 },
+      }}>
+        {t('common.skipToContent') || 'Skip to content'}
+      </Box>
+
       <AppBar
         position="fixed"
         sx={{
@@ -227,6 +235,7 @@ export default function Layout({ children }: LayoutProps) {
 
       <Box
         component="main"
+        id="main-content"
         sx={{
           flexGrow: 1,
           p: 3,
