@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.1.4 (2026-05-30)
+
+### New Features
+- **Tax reports**: HK tax year report (Apr 1 – Mar 31) with annual/quarterly views. Shows teacher info, customer breakdown, and individual invoice details. Export CSV or PDF with professional layout.
+- **Invoice PDF preview**: Preview invoices as PDF in a dialog before exporting. Available from the invoice edit page toolbar.
+- **Batch operations**: Select multiple invoices via checkboxes and mark as paid/sent or export all selected as PDFs in one click.
+- **Cloud backup page**: Dedicated settings page to set up, change, or remove backup location. "Save to Drive" opens the native file picker (Google Drive folder if installed) or downloads directly as fallback.
+
+### UI Improvements
+- **Error Boundary**: If a page crashes, shows a recovery message with Reload button instead of a white screen. Resets automatically when navigating to a different page.
+- **Loading state**: Invoice edit page shows a spinner overlay while loading data or saving.
+
+### Bug Fixes
+- **Tax year filter**: default now shows the correct current HK tax year (2025-04-01 → 2026-03-31 or as applicable)
+- **Missing paid_date**: old invoices marked as paid without a date are now included in the tax report
+- **DataGrid checkbox crash**: fixed "currentSelection.ids is not iterable" error when using batch selection
+- **PDF arrow character**: replaced Unicode → with dash in tax PDF (jsPDF doesn't support Unicode arrows)
+- **Backup fallback**: when the file picker isn't available, the app now directly downloads the database file
+- **ErrorBoundary closing tag**: fixed missing JSX closing tag that caused Vite build to fail
+
+### Tests
+- 38 new tests across 9 new files (280 total)
+- Full coverage for: InvoiceItemsTable, CustomerRatesTable, CustomerDetailPage, ErrorBoundary, PDFPreviewDialog, TaxReportsPage, CloudBackupPage, dbService, batch operations
+
+---
+
 ## v0.1.3 (2026-05-30)
 
 ### Bug Fixes
