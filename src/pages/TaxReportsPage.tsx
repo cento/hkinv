@@ -92,7 +92,7 @@ export default function TaxReportsPage() {
       doc.setFontSize(16);
       doc.text(t('pdf.taxReport') || `Tax Report ${taxYear - 1}/${taxYear}`, 14, 20);
       doc.setFontSize(10);
-      doc.text(`${t('pdf.period')}: ${getTaxYear(taxYear).start} → ${getTaxYear(taxYear).end}`, 14, 28);
+      doc.text(`${t('pdf.period')}: ${getTaxYear(taxYear).start} - ${getTaxYear(taxYear).end}`, 14, 28);
 
       const headers = [t('customers.name'), t('invoices.total'), t('invoices.title')];
       const body = data.map(r => [r.customer_name, `${r.total.toFixed(2)} HKD`, String(r.count)]);
