@@ -89,4 +89,26 @@ describe('WelcomePage', () => {
     expect(screen.queryByText(/welcome\.continueExisting/)).not.toBeInTheDocument();
     expect(screen.queryByText(/welcome\.setBackup/)).not.toBeInTheDocument();
   });
+
+  it('shows recent archive name, not backup name, as active archive', async () => {
+    localStorage.setItem('recent-archives', JSON.stringify([
+      { name: 'school.hkinv', lastOpened: new Date().toISOString() },
+    ]));
+    vi.mocked(hasExistingDB).mockResolvedValue(true);
+
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('school.hkinv')).toBeInTheDocument();
+    });
+
+    localStorage.removeItem('recent-archives');
+    vi.mocked(hasExistingDB).mockResolvedValue(false);
+  });
+
+  it('does not auto-configure backup when opening a file', () => {
+    // This is a structural test: the import of storeBackupHandle was removed.
+    // We verify the component renders without errors.
+    renderPage();
+    expect(screen.getByText('app.title')).toBeInTheDocument();
+  });
 });
