@@ -97,7 +97,7 @@ export default function WelcomePage() {
     const ok = await configureBackupLocation();
     if (ok) {
       startBackupTimer();
-      setToast({ open: true, message: 'Backup location configured ✓', severity: 'success' });
+      setToast({ open: true, message: t('welcome.backupConfigured'), severity: 'success' });
     }
   };
 
@@ -139,7 +139,7 @@ export default function WelcomePage() {
               sx={{ px: 4, py: 1.5, textTransform: 'none' }}
               color="inherit"
             >
-              Continue with{activeArchive ? ` ${activeArchive}` : ' existing archive'}
+              Continue with{activeArchive ? ` ${activeArchive}` : t('welcome.continueExisting')}
             </Button>
           )}
         </Stack>
@@ -152,7 +152,7 @@ export default function WelcomePage() {
             onClick={handleConfigureBackup}
             sx={{ mt: 2, opacity: 0.7 }}
           >
-            Set backup location
+            {t('welcome.setBackup')}
           </Button>
         )}
 

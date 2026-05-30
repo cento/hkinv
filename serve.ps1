@@ -70,7 +70,9 @@ function Serve-Request($stream, $distDir, $mimeTypes) {
         
         $bytes = [System.IO.File]::ReadAllBytes($filePath)
         
-        $resp = "HTTP/1.1 200 OK`r`nContent-Type: $contentType`r`nContent-Length: $($bytes.Length)`r`nConnection: close`r`nCache-Control: no-cache`r`n`r`n"
+        $csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; worker-src 'self' blob:;"
+        
+        $resp = "HTTP/1.1 200 OK`r`nContent-Type: $contentType`r`nContent-Length: $($bytes.Length)`r`nConnection: close`r`nCache-Control: no-cache`r`nContent-Security-Policy: $csp`r`nX-Content-Type-Options: nosniff`r`nX-Frame-Options: DENY`r`n`r`n"
         $respBytes = [System.Text.Encoding]::UTF8.GetBytes($resp)
         $stream.Write($respBytes, 0, $respBytes.Length)
         $stream.Write($bytes, 0, $bytes.Length)

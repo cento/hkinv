@@ -36,6 +36,16 @@
 
   "welcome.lastOpened": "Ultimo archivio aperto",
   "welcome.createNew": "Crea un nuovo archivio fatture per iniziare",
+  "welcome.continueWith": "Continua con {archive}",
+  "welcome.continueExisting": "Continua con archivio esistente",
+  "welcome.setBackup": "Imposta posizione backup",
+  "welcome.backupConfigured": "Posizione backup configurata ✓",
+
+  "layout.saved": "Salvato",
+  "layout.autoBackupDone": "Backup automatico completato",
+  "layout.backupNotConfigured": "Backup non configurato",
+  "layout.saveToFile": "Salva su file",
+  "layout.backupEnabled": "Backup: attivo",
 
   "wizard.title": "Configurazione Iniziale",
   "wizard.subtitle": "Inserisci i tuoi dati per iniziare a creare fatture",

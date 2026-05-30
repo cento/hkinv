@@ -10,6 +10,7 @@ const { mockInvoices } = vi.hoisted(() => ({
     { id: 1, status: 'sent', due_date: '2025-01-01', total: 1000, invoice_number: 'INV-001', customer_name: 'A', customer_id: 1, issue_date: '2025-01-01' },
     { id: 2, status: 'paid', total: 2000, invoice_number: 'INV-002', customer_name: 'B', customer_id: 2, issue_date: '2025-01-15', due_date: '2025-02-15' },
     { id: 3, status: 'draft', total: 500, invoice_number: 'INV-003', customer_name: 'C', customer_id: 3, issue_date: '2026-05-28', due_date: '2026-06-28' },
+    { id: 4, status: 'cancelled', total: 0, invoice_number: 'INV-004', customer_name: 'D', customer_id: 4, issue_date: '2026-05-01', due_date: '2026-06-01' },
   ],
 }));
 
@@ -78,4 +79,11 @@ describe('DashboardPage', () => {
     await waitFor(() => { expect(screen.getByText('dashboard.title')).toBeInTheDocument(); });
     expect(screen.getByText('invoices.new')).toBeInTheDocument();
   });
+
+  it('should show draft label and total count includes cancelled', async () => {
+    renderPage();
+    await waitFor(() => { expect(screen.getByText('dashboard.title')).toBeInTheDocument(); }, { timeout: 5000 });
+    expect(screen.getByText('4')).toBeInTheDocument();
+    expect(screen.getByText('invoices.draft')).toBeInTheDocument();
+  }, 10000);
 });

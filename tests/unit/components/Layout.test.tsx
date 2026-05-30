@@ -64,7 +64,7 @@ describe('Layout', () => {
       window.dispatchEvent(new CustomEvent('hkinv:backup', { detail: { success: true, manual: true } }));
     });
 
-    expect(await screen.findByText(/Saved/)).toBeInTheDocument();
+    expect(await screen.findByText(/layout\.saved/)).toBeInTheDocument();
   });
 
   it('should show snackbar with info message when backup not configured', async () => {
@@ -74,7 +74,7 @@ describe('Layout', () => {
       window.dispatchEvent(new CustomEvent('hkinv:backup', { detail: { success: false, manual: true } }));
     });
 
-    expect(await screen.findByText(/Backup not configured/)).toBeInTheDocument();
+    expect(await screen.findByText(/layout\.backupNotConfigured/)).toBeInTheDocument();
   });
 
   it('should show snackbar on auto-backup event', async () => {
@@ -84,7 +84,7 @@ describe('Layout', () => {
       window.dispatchEvent(new CustomEvent('hkinv:backup', { detail: { success: true, manual: false } }));
     });
 
-    expect(await screen.findByText(/Auto-backup done/)).toBeInTheDocument();
+    expect(await screen.findByText(/layout\.autoBackupDone/)).toBeInTheDocument();
   });
 
   it('should call triggerBackup when save icon is clicked', async () => {

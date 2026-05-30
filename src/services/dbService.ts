@@ -7,10 +7,14 @@ import { saveDatabase, getDatabase } from '../database/connection';
 import { triggerBackup } from '../database/backup';
 import { openHKINVFile, saveHKINVFile, downloadBlob } from '../database/fsa';
 
+let backupTimer: ReturnType<typeof setTimeout> | null = null;
+
 function notifySaveAll() {
-  saveDatabase();
-  triggerBackup(true).catch(() => {});
   import('../database/connection').then(m => m.notifySave());
+  if (backupTimer) clearTimeout(backupTimer);
+  backupTimer = setTimeout(() => {
+    triggerBackup(true).catch(() => {});
+  }, 2000);
 }
 
 const dbService = {

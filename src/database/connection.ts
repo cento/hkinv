@@ -7,6 +7,8 @@ let db: SqlJsDatabase | null = null;
 let dbFilePath: string | null = null;
 let SQL: SqlJsStatic | null = null;
 
+let saveQueue: Promise<void> = Promise.resolve();
+
 async function getSql() {
   if (!SQL) {
     SQL = await initSqlJs({
@@ -19,10 +21,22 @@ async function getSql() {
 export function saveDatabase(): void {
   if (!db) return;
   const data = new Uint8Array(db.export());
-  writeOPFSFile(DB_FILENAME, data.buffer);
+  saveQueue = saveQueue
+    .then(() => writeOPFSFile(DB_FILENAME, data.buffer))
+    .catch(() => {});
+}
+
+async function closeIfOpen() {
+  if (db) {
+    await saveQueue;
+    db.close();
+    db = null;
+    dbFilePath = null;
+  }
 }
 
 export async function createDatabase(): Promise<SqlJsDatabase> {
+  await closeIfOpen();
   const sql = await getSql();
   db = new sql.Database();
   dbFilePath = DB_FILENAME;
@@ -49,6 +63,7 @@ export async function openDatabase(): Promise<SqlJsDatabase> {
   if (!buffer) {
     return createDatabase();
   }
+  await closeIfOpen();
   const sql = await getSql();
   db = new sql.Database(new Uint8Array(buffer));
   dbFilePath = DB_FILENAME;
@@ -77,9 +92,10 @@ export function getDatabase(): SqlJsDatabase {
   return db;
 }
 
-export function closeDatabase(): void {
+export async function closeDatabase(): Promise<void> {
   if (db) {
     saveDatabase();
+    await saveQueue;
     db.close();
     db = null;
     dbFilePath = null;

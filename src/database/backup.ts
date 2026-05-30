@@ -1,5 +1,5 @@
 import { getDatabase } from './connection';
-import { getStoredBackupHandle, writeToHandle, verifyHandlePermission, clearStoredBackupHandle } from './fsa';
+import { getStoredBackupHandle, writeToHandle, verifyHandlePermission, clearStoredBackupHandle, getStoredBackupFileName } from './fsa';
 
 let backupTimer: ReturnType<typeof setInterval> | null = null;
 let lastBackupTime: Date | null = null;
@@ -54,20 +54,9 @@ export function stopBackupTimer(): void {
 }
 
 export function isBackupConfigured(): boolean {
-  try {
-    const raw = localStorage.getItem('hkinv-backup-handle');
-    return !!raw;
-  } catch {
-    return false;
-  }
+  return getStoredBackupFileName() !== null;
 }
 
 export function getBackupFileName(): string | null {
-  try {
-    const raw = localStorage.getItem('hkinv-backup-handle');
-    if (!raw) return null;
-    return JSON.parse(raw).name || null;
-  } catch {
-    return null;
-  }
+  return getStoredBackupFileName();
 }

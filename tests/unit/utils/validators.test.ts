@@ -91,4 +91,86 @@ describe('validateInvoiceItem', () => {
     expect(result.valid).toBe(false);
     expect(result.errors.some(e => e.field === 'hours')).toBe(true);
   });
+
+  it('should accept zero rate', () => {
+    const result = validateInvoiceItem({ description: 'Test', hours: 1, rate: 0 });
+    expect(result.valid).toBe(true);
+  });
+
+  it('should reject negative hours', () => {
+    const result = validateInvoiceItem({ description: 'Test', hours: -1, rate: 100 });
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.field === 'hours')).toBe(true);
+  });
+
+  it('should reject negative rate', () => {
+    const result = validateInvoiceItem({ description: 'Test', hours: 1, rate: -0.01 });
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.field === 'rate')).toBe(true);
+  });
+
+  it('should reject description with only spaces', () => {
+    const result = validateInvoiceItem({ description: '   ', hours: 1, rate: 100 });
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.field === 'description')).toBe(true);
+  });
+});
+
+describe('validateSettings phone and BR', () => {
+  it('should reject phone with fewer than 6 digits', () => {
+    const result = validateSettings({
+      teacher_name: 'Mario',
+      teacher_address: 'Via Roma 1',
+      teacher_phone: '12345',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.field === 'teacher_phone')).toBe(true);
+  });
+
+  it('should accept phone with 8 digits', () => {
+    const result = validateSettings({
+      teacher_name: 'Mario',
+      teacher_address: 'Via Roma 1',
+      teacher_phone: '12345678',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('should accept phone with formatted characters', () => {
+    const result = validateSettings({
+      teacher_name: 'Mario',
+      teacher_address: 'Via Roma 1',
+      teacher_phone: '+852 1234-5678',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('should reject BR number shorter than 5 characters', () => {
+    const result = validateSettings({
+      teacher_name: 'Mario',
+      teacher_address: 'Via Roma 1',
+      br_number: 'BR',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.field === 'br_number')).toBe(true);
+  });
+
+  it('should reject BR number longer than 25 characters', () => {
+    const result = validateSettings({
+      teacher_name: 'Mario',
+      teacher_address: 'Via Roma 1',
+      br_number: 'B'.repeat(26),
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.field === 'br_number')).toBe(true);
+  });
+
+  it('should accept valid BR number', () => {
+    const result = validateSettings({
+      teacher_name: 'Mario',
+      teacher_address: 'Via Roma 1',
+      br_number: 'BR12345678',
+    });
+    expect(result.valid).toBe(true);
+  });
 });

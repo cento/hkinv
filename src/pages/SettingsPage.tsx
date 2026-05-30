@@ -9,6 +9,7 @@ export default function SettingsPage() {
   const { t } = useTranslation();
   const { setSettingsComplete, setLanguage } = useAppContext();
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
   const [form, setForm] = useState({
     teacher_name: '',
@@ -50,7 +51,11 @@ export default function SettingsPage() {
   };
 
   const handleSave = async () => {
-    if (!form.teacher_name || !form.teacher_address) return;
+    const newErrors: Record<string, boolean> = {};
+    if (!form.teacher_name.trim()) newErrors.teacher_name = true;
+    if (!form.teacher_address.trim()) newErrors.teacher_address = true;
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
     try {
       setSaving(true);
       await api.settingsSave({
@@ -77,13 +82,13 @@ export default function SettingsPage() {
         <Typography variant="h6" sx={{ mb: 2 }}>{t('settings.teacherInfo')}</Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
-            <TextField fullWidth label={t('wizard.teacherName')} value={form.teacher_name} onChange={e => setForm(f => ({ ...f, teacher_name: e.target.value }))} required />
+            <TextField fullWidth label={t('wizard.teacherName')} value={form.teacher_name} onChange={e => { setForm(f => ({ ...f, teacher_name: e.target.value })); if (e.target.value.trim()) setErrors(prev => ({ ...prev, teacher_name: false })); }} required error={errors.teacher_name} helperText={errors.teacher_name ? t('validation.required') : ''} />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField fullWidth label={t('wizard.teacherEmail')} value={form.teacher_email} onChange={e => setForm(f => ({ ...f, teacher_email: e.target.value }))} />
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <TextField fullWidth label={t('wizard.teacherAddress')} value={form.teacher_address} onChange={e => setForm(f => ({ ...f, teacher_address: e.target.value }))} required multiline rows={2} />
+            <TextField fullWidth label={t('wizard.teacherAddress')} value={form.teacher_address} onChange={e => { setForm(f => ({ ...f, teacher_address: e.target.value })); if (e.target.value.trim()) setErrors(prev => ({ ...prev, teacher_address: false })); }} required multiline rows={2} error={errors.teacher_address} helperText={errors.teacher_address ? t('validation.required') : ''} />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField fullWidth label={t('wizard.teacherPhone')} value={form.teacher_phone} onChange={e => setForm(f => ({ ...f, teacher_phone: e.target.value }))} />
@@ -112,6 +117,7 @@ export default function SettingsPage() {
       
 
       <Button variant="contained" size="large" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving || !form.teacher_name || !form.teacher_address}>
+        {t('common.save')}
       </Button>
 
       <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast(t => ({ ...t, open: false }))}>

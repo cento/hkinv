@@ -67,7 +67,7 @@ export default function CustomersPage() {
           {t('customers.new')}
         </Button>
       </Box>
-      <Box sx={{ height: 500 }}>
+      <Box sx={{ height: 'calc(100vh - 280px)' }}>
         <DataGrid
           rows={customers}
           columns={columns}
