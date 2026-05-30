@@ -180,6 +180,7 @@
   "nav.settings": "Settings",
   "nav.dashboard": "Dashboard",
   "nav.taxReports": "Tax Reports",
+  "nav.cloudBackup": "Cloud Backup",
 
   "pdf.taxReport": "Tax Report",
   "pdf.period": "Period",
@@ -200,5 +201,20 @@
   "validation.br": "Invalid BR Number (5-25 characters)",
   "validation.positive": "Value must be positive",
 
-  "wizard.paymentTermsHelp": "E.g. \"30 days\", \"End of month\", \"Upon receipt\""
+  "wizard.paymentTermsHelp": "E.g. \"30 days\", \"End of month\", \"Upon receipt\"",
+
+  "cloudBackup.title": "Cloud Backup",
+  "cloudBackup.googleDrive": "Google Drive",
+  "cloudBackup.howTo": "How to back up to Google Drive",
+  "cloudBackup.howToDesc": "Click \"Save to Drive\" below, then choose \"Google Drive\" from the file picker. Your database will be saved as a .hkinv file.",
+  "cloudBackup.autoBackup": "Automatic backup",
+  "cloudBackup.configuredTo": "Backing up to: {name}",
+  "cloudBackup.notConfigured": "Not configured",
+  "cloudBackup.lastBackup": "Last backup",
+  "cloudBackup.changeLocation": "Change location",
+  "cloudBackup.setupBackup": "Set up backup",
+  "cloudBackup.saveToDrive": "Save to Drive",
+  "cloudBackup.remove": "Remove backup",
+  "cloudBackup.removed": "Backup location removed",
+  "cloudBackup.driveNote": "Tip: If you have Google Drive for Desktop installed, it appears as a folder in the Windows file picker. Save your .hkinv file there and it syncs automatically."
 }

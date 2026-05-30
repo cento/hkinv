@@ -31,6 +31,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import BackupIcon from '@mui/icons-material/Backup';
 import SaveIcon from '@mui/icons-material/Save';
+import CloudIcon from '@mui/icons-material/Cloud';
 import { useAppContext } from '../contexts/AppContext';
 import { changeLanguage } from '../i18n/index';
 import { isBackupConfigured, getBackupFileName, getLastBackupTime, triggerBackup } from '../database/backup';
@@ -122,6 +123,7 @@ export default function Layout({ children }: LayoutProps) {
     { text: t('nav.customers'), icon: <PeopleIcon />, path: '/customers' },
     { text: t('nav.serviceTypes'), icon: <LocalOfferIcon />, path: '/service-types' },
     { text: t('nav.taxReports'), icon: <AssessmentIcon />, path: '/tax-reports' },
+    { text: t('nav.cloudBackup'), icon: <CloudIcon />, path: '/cloud-backup' },
     { text: t('nav.settings'), icon: <SettingsIcon />, path: '/settings' },
   ];
 

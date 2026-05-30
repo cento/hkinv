@@ -14,6 +14,7 @@ const CustomersPage = lazy(() => import('./pages/CustomersPage'));
 const CustomerDetailPage = lazy(() => import('./pages/CustomerDetailPage'));
 const ServiceTypesPage = lazy(() => import('./pages/ServiceTypesPage'));
 const TaxReportsPage = lazy(() => import('./pages/TaxReportsPage'));
+const CloudBackupPage = lazy(() => import('./pages/CloudBackupPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 function PageLoader() {
@@ -45,6 +46,7 @@ function AppRoutes() {
           <Route path="/customers/:id" element={<CustomerDetailPage />} />
           <Route path="/service-types" element={<ServiceTypesPage />} />
           <Route path="/tax-reports" element={<TaxReportsPage />} />
+          <Route path="/cloud-backup" element={<CloudBackupPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </Suspense>
