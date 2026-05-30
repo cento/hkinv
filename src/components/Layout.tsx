@@ -64,6 +64,17 @@ function BackupIndicator() {
         result = await triggerBackup(true);
       }
     }
+    if (!result) {
+      try {
+        const { getDatabase } = await import('../database/connection');
+        const db = getDatabase();
+        const data = new Uint8Array(db.export());
+        const blob = new Blob([data], { type: 'application/octet-stream' });
+        const { downloadBlob } = await import('../database/fsa');
+        const fName = getBackupFileName() || `hkinv-backup-${new Date().toISOString().split('T')[0]}.hkinv`;
+        downloadBlob(blob, fName);
+      } catch {}
+    }
   };
 
   return (

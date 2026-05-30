@@ -5,6 +5,7 @@ import { CssBaseline, CircularProgress, Box } from '@mui/material';
 import { useAppContext } from './contexts/AppContext';
 import { getTheme } from './theme';
 import Layout from './components/Layout';
+import ErrorBoundary from './components/ErrorBoundary';
 import WelcomePage from './pages/WelcomePage';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
@@ -34,8 +35,9 @@ function AppRoutes() {
 
   return (
     <Layout>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />

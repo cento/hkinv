@@ -11,12 +11,10 @@ import api from '../services/dbService';
 import { downloadBlob } from '../database/fsa';
 import { formatError } from '../utils/validators';
 
-const HK_TAX_YEAR_START = { month: 3, day: 1 };
-
 function getTaxYear(year: number): { start: string; end: string } {
   return {
-    start: `${year - 1}-${String(HK_TAX_YEAR_START.month + 1).padStart(2, '0')}-${String(HK_TAX_YEAR_START.day).padStart(2, '0')}`,
-    end: `${year}-${String(HK_TAX_YEAR_START.month).padStart(2, '0')}-${String(HK_TAX_YEAR_START.day - 1).padStart(2, '0')}`,
+    start: `${year - 1}-04-01`,
+    end: `${year}-03-31`,
   };
 }
 
