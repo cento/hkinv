@@ -29,19 +29,17 @@ jobs:
       - run: npm run test:unit
         shell: pwsh
 
-      - run: npm run make
+      - run: npm run package
+        shell: pwsh
+
+      - name: Zip portable app
+        run: Compress-Archive -Path out/hkinv-win32-x64/* -DestinationPath out/hkinv-portable.zip
         shell: pwsh
 
       - uses: actions/upload-artifact@v4
         with:
           name: hkinv-portable
-          path: out/hkinv-win32-x64/
-          if-no-files-found: error
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: hkinv-installer
-          path: out/make/
+          path: out/hkinv-portable.zip
           if-no-files-found: error
 
   release:
@@ -54,10 +52,10 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: hkinv-installer
-          path: installer
+          name: hkinv-portable
+          path: .
 
       - uses: softprops/action-gh-release@v2
         with:
-          files: installer/**/*
+          files: hkinv-portable.zip
           generate_release_notes: true
