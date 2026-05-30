@@ -330,6 +330,7 @@ export default function InvoicesPage() {
           checkboxSelection
           disableRowSelectionOnClick
           onRowSelectionModelChange={setSelectedIds}
+          onRowDoubleClick={handleRowDoubleClick}
           slots={{ toolbar: GridToolbar, noRowsOverlay: EmptyState, footer: () => null }}
           slotProps={{ noRowsOverlay: { message: t('invoices.noInvoices'), actionLabel: t('invoices.new'), onAction: () => navigate('/invoices/new') } as any }}
         />
