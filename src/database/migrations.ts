@@ -107,17 +107,6 @@ function queryOne(db: SqlJsDatabase, sql: string, params?: any[]): Record<string
   return result;
 }
 
-function queryAll(db: SqlJsDatabase, sql: string, params?: any[]): Record<string, any>[] {
-  const stmt = db.prepare(sql);
-  if (params) stmt.bind(params);
-  const results: Record<string, any>[] = [];
-  while (stmt.step()) {
-    results.push(stmt.getAsObject());
-  }
-  stmt.free();
-  return results;
-}
-
 function execute(db: SqlJsDatabase, sql: string, params?: any[]): void {
   if (params) {
     const stmt = db.prepare(sql);

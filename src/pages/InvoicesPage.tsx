@@ -30,32 +30,33 @@ export default function InvoicesPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<Record<string, any> | null>(null);
   const [overdueCount, setOverdueCount] = useState(0);
   const [hidePaid, setHidePaid] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<GridRowSelectionModel>([]);
+  const [selectedIds, setSelectedIds] = useState<GridRowSelectionModel>({ type: 'include', ids: new Set() });
   const [selectionKey, setSelectionKey] = useState(0);
 
   const handleBatchStatus = async (status: string) => {
     try {
-      const ids = selectedIds;
+      const count = selectedIds.ids.size;
+      const ids = selectedIds.ids;
       setSelectionKey(k => k + 1);
-      setSelectedIds([]);
+      setSelectedIds({ type: 'include', ids: new Set() });
       for (const id of ids) {
         await api.invoicesUpdate(Number(id), { status } as any);
         if (status === 'paid') {
           await api.invoicesUpdate(Number(id), { paid_date: new Date().toISOString().split('T')[0] } as any);
         }
       }
-      setSelectedIds([]);
       await loadInvoices();
-      setToast({ open: true, message: `${selectedIds.length} ${t('invoices.title')} → ${t(`invoices.${status}`)}`, severity: 'success' });
+      setToast({ open: true, message: `${count} ${t('invoices.title')} → ${t(`invoices.${status}`)}`, severity: 'success' });
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
   };
 
   const handleBatchExport = async () => {
-    const ids = selectedIds;
+    const count = selectedIds.ids.size;
+    const ids = selectedIds.ids;
     setSelectionKey(k => k + 1);
-    setSelectedIds([]);
+    setSelectedIds({ type: 'include', ids: new Set() });
     try {
       for (const id of ids) {
         const inv = (await api.invoicesGetById(Number(id))) as Record<string, any> | null;
@@ -77,8 +78,7 @@ export default function InvoicesPage() {
         });
         downloadBlob(doc.output('blob'), `${inv.invoice_number}.pdf`);
       }
-      setToast({ open: true, message: `${selectedIds.length} PDF ${t('common.save')} ✓`, severity: 'success' });
-      setSelectedIds([]);
+      setToast({ open: true, message: `${count} PDF ${t('common.save')} ✓`, severity: 'success' });
     } catch (err: any) {
       setToast({ open: true, message: String(err), severity: 'error' });
     }
@@ -215,10 +215,6 @@ export default function InvoicesPage() {
     navigate(`/invoices/${params.id}`);
   };
 
-  const handleRowClick = (params: GridRowParams) => {
-    navigate(`/invoices/${params.id}`);
-  };
-
   const columns: GridColDef[] = [
     { field: 'invoice_number', headerName: t('invoices.number'), flex: 1.5, minWidth: 120 },
     { field: 'customer_name', headerName: t('invoices.customer'), flex: 1.5, minWidth: 120 },
@@ -293,9 +289,9 @@ export default function InvoicesPage() {
         </Button>
       </Box>
 
-      {selectedIds.length > 0 && (
+      {selectedIds.ids.size > 0 && (
         <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
-          <Typography variant="body2" sx={{ mr: 1 }}>{selectedIds.length} selected</Typography>
+          <Typography variant="body2" sx={{ mr: 1 }}>{selectedIds.ids.size} selected</Typography>
           <Tooltip title={t('invoices.paid')}>
             <Button size="small" color="success" startIcon={<CheckCircleIcon />}
               onClick={() => handleBatchStatus('paid')}>
@@ -309,7 +305,7 @@ export default function InvoicesPage() {
             </Button>
           </Tooltip>
           <Button size="small" startIcon={<DownloadIcon />} onClick={handleBatchExport}>
-            PDF ({selectedIds.length})
+            PDF ({selectedIds.ids.size})
           </Button>
         </Box>
       )}

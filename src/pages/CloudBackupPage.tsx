@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Box, Typography, Button, Paper, Snackbar, Alert, List, ListItem,
-  ListItemIcon, ListItemText, Divider, Link,
+  Box, Typography, Button, Paper, List, ListItem,
+  ListItemIcon, ListItemText, Divider,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoIcon from '@mui/icons-material/Info';
-import { configureBackupLocation, getStoredBackupFileName, clearStoredBackupHandle, supportsFSA, saveHKINVFile } from '../database/fsa';
+import { configureBackupLocation, getStoredBackupFileName, clearStoredBackupHandle, supportsFSA, saveHKINVFile, downloadBlob } from '../database/fsa';
 import { getDatabase } from '../database/connection';
 import { getLastBackupTime, isBackupConfigured } from '../database/backup';
-import { downloadBlob } from '../database/fsa';
 
 export default function CloudBackupPage() {
   const { t } = useTranslation();
   const [backupName, setBackupName] = useState<string | null>(null);
   const [backupTime, setBackupTime] = useState<Date | null>(null);
   const [configured, setConfigured] = useState(false);
-  const [toast, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
-
+  const [, setToast] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   useEffect(() => {
     setBackupName(getStoredBackupFileName());
     setBackupTime(getLastBackupTime());

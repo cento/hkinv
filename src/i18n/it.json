@@ -200,6 +200,7 @@
   "validation.phone": "Numero di telefono non valido (6-15 cifre)",
   "validation.br": "BR Number non valido (5-25 caratteri)",
   "validation.positive": "Il valore deve essere positivo",
+  "validation.atLeastOneItem": "Devi aggiungere almeno una voce",
 
   "wizard.paymentTermsHelp": "Es. \"30 giorni\", \"Fine mese\", \"A ricevimento fattura\"",
 

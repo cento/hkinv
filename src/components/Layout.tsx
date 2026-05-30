@@ -73,7 +73,7 @@ function BackupIndicator() {
         const { downloadBlob } = await import('../database/fsa');
         const fName = getBackupFileName() || `hkinv-backup-${new Date().toISOString().split('T')[0]}.hkinv`;
         downloadBlob(blob, fName);
-      } catch {}
+      } catch { /* Ignored: fallback save attempt */ }
     }
   };
 

@@ -200,6 +200,7 @@
   "validation.phone": "Invalid phone number (6-15 digits)",
   "validation.br": "Invalid BR Number (5-25 characters)",
   "validation.positive": "Value must be positive",
+  "validation.atLeastOneItem": "At least one item is required",
 
   "wizard.paymentTermsHelp": "E.g. \"30 days\", \"End of month\", \"Upon receipt\"",
 

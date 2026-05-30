@@ -1,6 +1,5 @@
 ﻿import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
-import initSqlJs from 'sql.js';
-import { Database as SqlJsDatabase } from 'sql.js';
+import initSqlJs, { Database as SqlJsDatabase } from 'sql.js';
 import { runMigrations } from '../../../src/database/migrations';
 import * as invoicesDb from '../../../src/database/invoices';
 import * as customersDb from '../../../src/database/customers';

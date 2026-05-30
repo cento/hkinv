@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/dbService';
 import CustomerDialog, { CustomerFormData } from '../components/CustomerDialog';
-import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
+import { EmptyState } from '../components/ConfirmDialog';
 
 export default function CustomersPage() {
   const { t } = useTranslation();

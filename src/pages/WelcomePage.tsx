@@ -6,12 +6,11 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import BackupIcon from '@mui/icons-material/Backup';
 import { useAppContext } from '../contexts/AppContext';
-import { createDatabase, importDatabase, openDatabase } from '../database/connection';
+import { createDatabase, importDatabase, openDatabase, getDatabase } from '../database/connection';
 import { hasExistingDB } from '../database/opfs';
 import { openHKINVFile, configureBackupLocation, storeBackupHandle, getStoredBackupFileName } from '../database/fsa';
 import { hasSettings } from '../database/settings';
 import { runMigrations } from '../database/migrations';
-import { getDatabase } from '../database/connection';
 import { startBackupTimer } from '../database/backup';
 
 const RECENT_KEY = 'recent-archives';

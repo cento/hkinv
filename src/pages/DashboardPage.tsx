@@ -36,7 +36,7 @@ export default function DashboardPage() {
     customerCount: 0,
   });
   const [overdueInvoices, setOverdueInvoices] = useState<Record<string, any>[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   const loadStats = useCallback(async () => {
     try {

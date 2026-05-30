@@ -14,7 +14,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import api from '../services/dbService';
 import InvoiceItemsTable, { InvoiceItemRow } from '../components/InvoiceItemsTable';
 import { formatDateISO, calculateDueDate } from '../utils/format';
-import { validateInvoice } from '../utils/validators';
+import { validateInvoice, validateInvoiceItem } from '../utils/validators';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PDFPreviewDialog from '../components/PDFPreviewDialog';
 import { downloadBlob } from '../database/fsa';
@@ -210,6 +210,23 @@ export default function InvoiceEditPage() {
       };
       const msg = validation.errors.map(e => `• ${fieldLabels[e.field] || e.field}: ${t(e.message)}`).join('\n');
       setToast({ open: true, message: msg, severity: 'error' });
+      return;
+    }
+
+    // Validate invoice items
+    if (items.length === 0) {
+      setToast({ open: true, message: t('validation.atLeastOneItem') || 'At least one item is required', severity: 'error' });
+      return;
+    }
+    const itemErrors: string[] = [];
+    for (const item of items) {
+      const itemValidation = validateInvoiceItem(item);
+      if (!itemValidation.valid) {
+        itemErrors.push(...itemValidation.errors.map(e => `• ${t('invoices.items')} #${item.tempId}: ${t(e.message)}`));
+      }
+    }
+    if (itemErrors.length > 0) {
+      setToast({ open: true, message: itemErrors.join('\n'), severity: 'error' });
       return;
     }
 

@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { hasSettings } from '../database/settings';
 import { stopBackupTimer, startBackupTimer } from '../database/backup';
 
 export interface AppState {
@@ -76,6 +75,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAppContext(): AppContextType {
   const context = useContext(AppContext);
   if (!context) {

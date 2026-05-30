@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, fireEvent } from '@testing-library/react';
 import { useKeyboardShortcuts } from '../../../src/hooks/useKeyboardShortcuts';
 
 describe('useKeyboardShortcuts', () => {
@@ -87,5 +87,4 @@ describe('useKeyboardShortcuts', () => {
   });
 });
 
-// Need fireEvent import
-import { fireEvent } from '@testing-library/react';
+

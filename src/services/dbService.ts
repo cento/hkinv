@@ -3,9 +3,9 @@ import * as customerRates from '../database/customerRates';
 import * as invoices from '../database/invoices';
 import * as serviceTypes from '../database/serviceTypes';
 import * as settingsDb from '../database/settings';
-import { saveDatabase, getDatabase } from '../database/connection';
+import { getDatabase } from '../database/connection';
 import { triggerBackup } from '../database/backup';
-import { openHKINVFile, saveHKINVFile, downloadBlob } from '../database/fsa';
+import { openHKINVFile, saveHKINVFile } from '../database/fsa';
 
 let backupTimer: ReturnType<typeof setTimeout> | null = null;
 
