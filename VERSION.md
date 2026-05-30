@@ -1,5 +1,43 @@
 # Changelog
 
+## v0.1.6 (2026-05-31)
+
+### Major Features
+- **Type-safe dbService**: all `Record<string, unknown>` and `as any` casts replaced with real TypeScript interfaces from database modules
+- **Archive/Backup separation**: opening a file no longer auto-configures it as backup; archive and backup are fully independent concepts
+- **Dashboard archive & backup info**: shows archive name and backup name (if configured) at the top of the Dashboard
+- **Backup warnings**: Dashboard alerts when no backup is configured, or when backup file is the same as the archive
+- **Onboarding wizard**: 3-step guided dialog (teacher info → first customer → first invoice) appears after creating a new archive
+- **Dashboard empty state**: CTA to create first invoice when no invoices exist
+
+### Validation
+- **Invoice item validation**: empty items, zero hours, or negative rates now block save (was defined but never called)
+- **GridRowSelectionModel fix**: batch selection in InvoicesPage now correctly uses MUI X v9 `{type, ids: Set}` API
+
+### UI/UX
+- **"Cloud Backup" renamed to "Backup & Sync"**: better description — it's a local file that can be synced via cloud folders
+- **Backup name interpolation fixed**: "Backing up to: {name}" now shows the actual filename
+- **ESLint: 58→0 warnings**: all dead code, duplicate imports, empty catch blocks, and react-refresh issues resolved
+- **useEffect dependencies**: 4 missing dependency warnings fixed (CustomerRatesTable, Layout, InvoiceEditPage)
+
+### Tests (288→327, +39)
+- Dashboard: archive section, backup warnings, empty state, backup configured/not configured
+- WelcomePage: archive/backup independence, no auto-backup on file open
+- OnboardingWizard: 8 tests (render, 3 steps, skip, finish, navigation)
+- ServiceTypesPage: delete blocked when in use, allowed when free
+- CustomersPage: render, new button
+- Layout BackupIndicator: renders when db is open
+- ErrorBoundary: crash catching, reload, custom fallback
+- formatHKD: 5 tests for proper HK$ formatting
+- Various utility tests (generateInvoiceNumber, calculateDueDate, parseHKD, formatDate)
+
+### Dev Experience
+- `.reasonix/` added to `.gitignore`
+- 0 ESLint errors, 0 ESLint warnings, 0 TSC errors
+- 327 tests passing across 44 files
+
+---
+
 ## v0.1.4 (2026-05-30)
 
 ### New Features
