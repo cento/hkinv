@@ -29,7 +29,9 @@ function getQuarterRanges(year: number): { label: string; start: string; end: st
 
 export default function TaxReportsPage() {
   const { t } = useTranslation();
-  const [taxYear, setTaxYear] = useState(new Date().getFullYear());
+  const now = new Date();
+  const defaultYear = now.getMonth() >= 3 ? now.getFullYear() + 1 : now.getFullYear();
+  const [taxYear, setTaxYear] = useState(defaultYear);
   const [viewMode, setViewMode] = useState<'annual' | 'quarterly'>('annual');
   const [data, setData] = useState<{ customer_name: string; total: number; count: number }[]>([]);
   const [summary, setSummary] = useState({ totalIncome: 0, totalInvoices: 0, customerCount: 0 });

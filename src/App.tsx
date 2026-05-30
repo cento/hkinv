@@ -1,5 +1,5 @@
 import React, { useMemo, lazy, Suspense } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, CircularProgress, Box } from '@mui/material';
 import { useAppContext } from './contexts/AppContext';
@@ -28,6 +28,7 @@ function PageLoader() {
 
 function AppRoutes() {
   const { state } = useAppContext();
+  const location = useLocation();
 
   if (!state.isDbOpen) {
     return <WelcomePage />;
@@ -35,7 +36,7 @@ function AppRoutes() {
 
   return (
     <Layout>
-      <ErrorBoundary>
+      <ErrorBoundary key={location.pathname}>
         <Suspense fallback={<PageLoader />}>
           <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

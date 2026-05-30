@@ -8,9 +8,9 @@ import TaxReportsPage from '../../../src/pages/TaxReportsPage';
 vi.mock('../../../src/services/dbService', () => ({
   default: {
     invoicesGetAll: vi.fn().mockResolvedValue([
-      { id: 1, status: 'paid', paid_date: '2025-06-15', total: 1000, customer_name: 'School A', customer_id: 1, invoice_number: 'INV-001', issue_date: '2025-06-01', due_date: '2025-07-01' },
-      { id: 2, status: 'paid', paid_date: '2025-07-20', total: 2000, customer_name: 'School B', customer_id: 2, invoice_number: 'INV-002', issue_date: '2025-07-01', due_date: '2025-08-01' },
-      { id: 3, status: 'draft', total: 500, customer_name: 'School A', customer_id: 1, invoice_number: 'INV-003', issue_date: '2025-08-01', due_date: '2025-09-01' },
+      { id: 1, status: 'paid', paid_date: '2026-06-15', total: 1000, customer_name: 'School A', customer_id: 1, invoice_number: 'INV-001', issue_date: '2026-06-01', due_date: '2026-07-01' },
+      { id: 2, status: 'paid', paid_date: '2026-07-20', total: 2000, customer_name: 'School B', customer_id: 2, invoice_number: 'INV-002', issue_date: '2026-07-01', due_date: '2026-08-01' },
+      { id: 3, status: 'draft', total: 500, customer_name: 'School A', customer_id: 1, invoice_number: 'INV-003', issue_date: '2026-08-01', due_date: '2026-09-01' },
     ]),
   },
 }));
