@@ -109,45 +109,23 @@ try {
     
     Start-Process $url
     
-    $acceptPending = $false
-    $asyncResult = $null
-    
     while ($global:running) {
-        if (-not $acceptPending) {
+        try {
+            $client = $listener.AcceptTcpClient()
+            $stream = $null
             try {
-                $asyncResult = $listener.BeginAcceptTcpClient($null, $null)
-                $acceptPending = $true
-            } catch {
-                Start-Sleep -Milliseconds 100
-                continue
+                $stream = $client.GetStream()
+                Serve-Request $stream $distDir $mimeTypes
+            } finally {
+                if ($stream) { $stream.Close() }
+                $client.Close()
             }
-        }
-        
-        if ($asyncResult -and $asyncResult.IsCompleted) {
-            try {
-                $client = $listener.EndAcceptTcpClient($asyncResult)
-                $acceptPending = $false
-                
-                $stream = $null
-                try {
-                    $stream = $client.GetStream()
-                    Serve-Request $stream $distDir $mimeTypes
-                } finally {
-                    if ($stream) { $stream.Close() }
-                    $client.Close()
-                }
-            } catch {
-                $acceptPending = $false
-                Start-Sleep -Milliseconds 50
-            }
-        } else {
+        } catch {
+            if (-not $global:running) { break }
             Start-Sleep -Milliseconds 50
         }
     }
 } finally {
-    if ($asyncResult) {
-        try { $listener.EndAcceptTcpClient($asyncResult) } catch {}
-    }
     $listener.Stop()
     Write-Host "`nServer stopped." -ForegroundColor Gray
 }
