@@ -1,12 +1,24 @@
 import { defineConfig } from 'vite';
+import { execSync } from 'child_process';
+
+function getVersion(): string {
+  try {
+    return execSync('git describe --tags --abbrev=0', { encoding: 'utf8' }).trim();
+  } catch {
+    return '0.0.0';
+  }
+}
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(getVersion()),
+  },
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['icon-192.png', 'icon-512.png'],
       manifest: false, // uses public/manifest.json
       workbox: {

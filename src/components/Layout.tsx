@@ -36,6 +36,7 @@ import CloudIcon from '@mui/icons-material/Cloud';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { useAppContext } from '../contexts/AppContext';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
+import { useUpdateCheck } from '../hooks/useUpdateCheck';
 import { changeLanguage } from '../i18n/index';
 import { isBackupConfigured, getBackupFileName, getLastBackupTime, triggerBackup } from '../database/backup';
 import { configureBackupLocation } from '../database/fsa';
@@ -117,6 +118,7 @@ export default function Layout({ children }: LayoutProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [backupToast, setBackupToast] = React.useState<{ open: boolean; message: string; severity: 'success' | 'info' | 'error' }>({ open: false, message: '', severity: 'success' });
   const { installable, install } = useInstallPrompt();
+  const { updateReady, update: applyUpdate } = useUpdateCheck();
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -191,7 +193,7 @@ export default function Layout({ children }: LayoutProps) {
         </IconButton>
       </Box>
       {installable && (
-        <Box sx={{ px: 2, pb: 2, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ px: 2, pb: 1, display: 'flex', justifyContent: 'center' }}>
           <Button
             variant="outlined"
             size="small"
@@ -203,6 +205,11 @@ export default function Layout({ children }: LayoutProps) {
           </Button>
         </Box>
       )}
+      <Box sx={{ px: 2, pb: 2, display: 'flex', justifyContent: 'center' }}>
+        <Typography variant="caption" color="text.disabled">
+          {__APP_VERSION__}
+        </Typography>
+      </Box>
     </Box>
   );
 
@@ -286,6 +293,24 @@ export default function Layout({ children }: LayoutProps) {
       >
         <Alert severity={backupToast.severity} variant="filled" sx={{ minWidth: 200 }}>
           {backupToast.message}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={updateReady}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{ bottom: 60 }}
+      >
+        <Alert
+          severity="info"
+          variant="filled"
+          action={
+            <Button color="inherit" size="small" onClick={applyUpdate}>
+              {t('common.updateNow') || 'Update'}
+            </Button>
+          }
+        >
+          {t('common.updateAvailable') || 'A new version is available. Click Update to refresh.'}
         </Alert>
       </Snackbar>
     </Box>

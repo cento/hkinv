@@ -23,6 +23,8 @@
   "common.pageSize": "Righe per pagina",
   "common.view": "Vedi",
   "common.print": "Stampa",
+  "common.updateAvailable": "Nuova versione disponibile.",
+  "common.updateNow": "Aggiorna",
   "common.share": "Condividi",
   "common.skip": "Salta",
   "common.review": "Riepilogo",

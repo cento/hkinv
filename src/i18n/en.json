@@ -23,6 +23,8 @@
   "common.pageSize": "Rows per page",
   "common.view": "View",
   "common.print": "Print",
+  "common.updateAvailable": "A new version is available.",
+  "common.updateNow": "Update now",
   "common.share": "Share",
   "common.skip": "Skip",
   "common.review": "Review",
