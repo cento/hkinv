@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
 
 function getVersion(): string {
   try {
@@ -7,7 +8,7 @@ function getVersion(): string {
   } catch {
     // Fallback: read from package.json (CI may not have git tags)
     try {
-      const pkg = require('./package.json');
+      const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
       return `v${pkg.version}`;
     } catch {
       return 'v0.0.0';
