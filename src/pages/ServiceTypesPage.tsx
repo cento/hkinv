@@ -4,6 +4,7 @@ import { Box, Typography, Button, Snackbar, Alert } from '@mui/material';
 import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import api from '../services/dbService';
+import { formatError } from '../utils/validators';
 import { formatHKD } from '../utils/format';
 import ServiceTypeDialog, { ServiceTypeFormData } from '../components/ServiceTypeDialog';
 import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
@@ -23,7 +24,7 @@ export default function ServiceTypesPage() {
       const data = await api.serviceTypesGetAll();
       setServices(data);
     } catch (err) {
-      console.error(err);
+      setToast({ open: true, message: formatError(err), severity: 'error' });
     } finally {
       setLoading(false);
     }

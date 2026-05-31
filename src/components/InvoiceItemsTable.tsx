@@ -9,6 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import api from '../services/dbService';
 import { formatHKD } from '../utils/format';
+import { formatError } from '../utils/validators';
 
 export interface InvoiceItemRow {
   tempId: number;
@@ -38,7 +39,7 @@ export default function InvoiceItemsTable({ items, onChange, customerId, readOnl
   }, [items]);
 
   useEffect(() => {
-    api.serviceTypesGetAll().then(setServiceTypes).catch(console.error);
+    api.serviceTypesGetAll().then(setServiceTypes).catch(err => console.error(formatError(err)));
   }, []);
 
   const addItem = () => {

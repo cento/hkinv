@@ -5,6 +5,7 @@ import { Box, Typography, Button, Paper, Grid, Tabs, Tab, Snackbar, Alert } from
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import api from '../services/dbService';
+import { formatError } from '../utils/validators';
 import { formatHKD } from '../utils/format';
 import CustomerDialog, { CustomerFormData } from '../components/CustomerDialog';
 import CustomerRatesTable from '../components/CustomerRatesTable';
@@ -30,7 +31,7 @@ export default function CustomerDetailPage() {
       setCustomer(c);
       setInvoices(inv as any[]);
     } catch (err) {
-      console.error(err);
+      console.error(formatError(err));
     }
   }, [customerId]);
 

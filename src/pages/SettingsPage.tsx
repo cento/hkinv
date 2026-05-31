@@ -4,6 +4,7 @@ import { Box, Typography, TextField, Button, Paper, Grid, Snackbar, Alert } from
 import SaveIcon from '@mui/icons-material/Save';
 import { useAppContext } from '../contexts/AppContext';
 import api from '../services/dbService';
+import { formatError } from '../utils/validators';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
@@ -46,7 +47,7 @@ export default function SettingsPage() {
         });
       }
     } catch (err) {
-      console.error(err);
+      setToast({ open: true, message: formatError(err), severity: 'error' });
     }
   };
 

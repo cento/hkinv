@@ -14,7 +14,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import api from '../services/dbService';
 import InvoiceItemsTable, { InvoiceItemRow } from '../components/InvoiceItemsTable';
 import { formatDateISO, calculateDueDate, formatHKD } from '../utils/format';
-import { validateInvoice, validateInvoiceItem } from '../utils/validators';
+import { formatError, validateInvoice, validateInvoiceItem } from '../utils/validators';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PDFPreviewDialog from '../components/PDFPreviewDialog';
 import { downloadBlob } from '../database/fsa';
@@ -72,7 +72,7 @@ export default function InvoiceEditPage() {
       if (isNew && invNum && !invoiceNumberEdited.current) {
         setInvoiceNumber(invNum as string);
       }
-    }).catch(console.error).finally(() => setLoading(false));
+    }).catch(err => setToast({ open: true, message: formatError(err), severity: 'error' })).finally(() => setLoading(false));
   }, [isNew]);
 
   // Load existing invoice for editing
@@ -106,7 +106,7 @@ export default function InvoiceEditPage() {
         dataReadyRef.current = true;
         setDataReady(true);
       } catch (err) {
-        console.error(err);
+        setToast({ open: true, message: formatError(err), severity: 'error' });
       } finally {
         setLoading(false);
       }
@@ -178,7 +178,7 @@ export default function InvoiceEditPage() {
         }
       }
     } catch (err) {
-      console.error('Template load error:', err);
+      setToast({ open: true, message: formatError(err), severity: 'error' });
     } finally {
       setTemplateReady(true);
     }

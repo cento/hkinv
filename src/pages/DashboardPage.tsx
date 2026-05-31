@@ -10,6 +10,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import api from '../services/dbService';
+import { formatError } from '../utils/validators';
 import { formatHKD } from '../utils/format';
 import { EmptyState } from '../components/ConfirmDialog';
 import { useAppContext } from '../contexts/AppContext';
@@ -82,7 +83,7 @@ export default function DashboardPage() {
       });
       setOverdueInvoices(overdue);
     } catch (err) {
-      console.error(err);
+      console.error(formatError(err));
     } finally {
       setLoading(false);
     }

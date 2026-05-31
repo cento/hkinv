@@ -11,6 +11,7 @@ import api from '../services/dbService';
 import InvoiceFilters, { FilterValues, defaultFilters } from '../components/InvoiceFilters';
 import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
 import { downloadBlob } from '../database/fsa';
+import { formatError } from '../utils/validators';
 import { formatHKD } from '../utils/format';
 
 const statusColors: Record<string, 'default' | 'primary' | 'success' | 'error' | 'warning'> = {
@@ -99,14 +100,14 @@ export default function InvoicesPage() {
       const data = (await api.invoicesSearch(sqlFilters)) as Record<string, any>[];
       setInvoices(data || []);
     } catch (err) {
-      console.error(err);
+      setToast({ open: true, message: formatError(err), severity: 'error' });
     } finally {
       setLoading(false);
     }
   }, [filters]);
 
   useEffect(() => {
-    api.customersGetAll().then(c => setCustomers(c as Record<string, any>[])).catch(console.error);
+    api.customersGetAll().then(c => setCustomers(c as Record<string, any>[])).catch(err => setToast({ open: true, message: formatError(err), severity: 'error' }));
   }, []);
 
   useEffect(() => {
@@ -114,7 +115,7 @@ export default function InvoicesPage() {
       const today = new Date().toISOString().split('T')[0];
       const overdue = (all || []).filter((i: any) => i.status === 'sent' && i.due_date && i.due_date < today);
       setOverdueCount(overdue.length);
-    }).catch(console.error);
+    }).catch(err => setToast({ open: true, message: formatError(err), severity: 'error' }));
   }, [invoices]);
 
   useEffect(() => { loadInvoices(); }, [loadInvoices]);

@@ -5,6 +5,7 @@ import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/dbService';
+import { formatError } from '../utils/validators';
 import CustomerDialog, { CustomerFormData } from '../components/CustomerDialog';
 import { EmptyState } from '../components/ConfirmDialog';
 
@@ -23,7 +24,7 @@ export default function CustomersPage() {
       const data = await api.customersGetAll();
       setCustomers(data);
     } catch (err) {
-      console.error(err);
+      setToast({ open: true, message: formatError(err), severity: 'error' });
     } finally {
       setLoading(false);
     }

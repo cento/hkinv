@@ -9,6 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import api from '../services/dbService';
+import { formatError } from '../utils/validators';
 import { formatHKD } from '../utils/format';
 import ConfirmDialog from './ConfirmDialog';
 
@@ -45,7 +46,7 @@ export default function CustomerRatesTable({ customerId }: Props) {
       setRates(r as Rate[]);
       setServices(s as any[]);
     } catch (err) {
-      console.error(err);
+      setToast({ open: true, message: formatError(err), severity: 'error' });
     } finally {
       setLoading(false);
     }
