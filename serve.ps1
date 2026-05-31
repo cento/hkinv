@@ -93,15 +93,12 @@ $listener = New-Object System.Net.Sockets.TcpListener($address, $port)
 $global:running = $true
 [Console]::TreatControlCAsInput = $false
 try {
-    [Console]::CancelKeyPress += { Write-Host "`nShutting down..." -ForegroundColor Yellow; $global:running = $false }
+    [Console]::CancelKeyPress += {
+        Write-Host "`nShutting down..." -ForegroundColor Yellow
+        $global:running = $false
+        $listener.Stop()
+    }
 } catch {}
-
-trap {
-    Write-Host "`nShutting down..." -ForegroundColor Yellow
-    $global:running = $false
-    $listener.Stop()
-    continue
-}
 
 try {
     $listener.Start()
