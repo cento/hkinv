@@ -93,7 +93,11 @@ $listener = New-Object System.Net.Sockets.TcpListener($address, $port)
 $global:running = $true
 [Console]::TreatControlCAsInput = $false
 try {
-    [Console]::CancelKeyPress += { Write-Host "`nShutting down..." -ForegroundColor Yellow; $global:running = $false }
+    [Console]::CancelKeyPress += {
+        Write-Host "`nShutting down..." -ForegroundColor Yellow
+        $global:running = $false
+        $listener.Stop()
+    }
 } catch {}
 
 try {
@@ -109,45 +113,29 @@ try {
     
     Start-Process $url
     
-    $acceptPending = $false
-    $asyncResult = $null
-    
     while ($global:running) {
-        if (-not $acceptPending) {
-            try {
-                $asyncResult = $listener.BeginAcceptTcpClient($null, $null)
-                $acceptPending = $true
-            } catch {
-                Start-Sleep -Milliseconds 100
-                continue
-            }
+        # Wait for a connection — Start-Sleep is interruptible by Ctrl+C
+        while ($global:running -and -not $listener.Pending()) {
+            Start-Sleep -Milliseconds 100
         }
+        if (-not $global:running) { break }
         
-        if ($asyncResult -and $asyncResult.IsCompleted) {
+        try {
+            $client = $listener.AcceptTcpClient()
+            $stream = $null
             try {
-                $client = $listener.EndAcceptTcpClient($asyncResult)
-                $acceptPending = $false
-                
-                $stream = $null
-                try {
-                    $stream = $client.GetStream()
-                    Serve-Request $stream $distDir $mimeTypes
-                } finally {
-                    if ($stream) { $stream.Close() }
-                    $client.Close()
-                }
-            } catch {
-                $acceptPending = $false
-                Start-Sleep -Milliseconds 50
+                $stream = $client.GetStream()
+                Serve-Request $stream $distDir $mimeTypes
+            } finally {
+                if ($stream) { $stream.Close() }
+                $client.Close()
             }
-        } else {
-            Start-Sleep -Milliseconds 50
+        } catch {
+            if (-not $global:running) { break }
         }
     }
 } finally {
-    if ($asyncResult) {
-        try { $listener.EndAcceptTcpClient($asyncResult) } catch {}
-    }
     $listener.Stop()
     Write-Host "`nServer stopped." -ForegroundColor Gray
+    Read-Host "Press Enter to close"
 }

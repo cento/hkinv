@@ -23,6 +23,7 @@
   "common.pageSize": "Righe per pagina",
   "common.view": "Vedi",
   "common.print": "Stampa",
+  "common.share": "Condividi",
   "common.skip": "Salta",
   "common.review": "Riepilogo",
   "common.confirmSave": "Conferma e salva",
@@ -154,6 +155,7 @@
   "invoices.numberAlreadyExists": "Questo numero fattura è già presente",
 
   "welcome.firstRun": "Per iniziare, crea un nuovo archivio o aprine uno esistente.",
+  "welcome.installApp": "Installa App",
   "welcome.quickGuide": "Guida rapida",
   "welcome.stepCreate": "Crea un nuovo archivio",
   "welcome.stepDescribe": "Verrà creato un nuovo file dove saranno salvati tutte le fatture e i clienti. Usa il pulsante Salva nella barra degli strumenti per tenere una copia di backup nella cartella Documenti.",

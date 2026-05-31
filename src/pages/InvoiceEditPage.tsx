@@ -11,6 +11,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PrintIcon from '@mui/icons-material/Print';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ShareIcon from '@mui/icons-material/Share';
 import api from '../services/dbService';
 import InvoiceItemsTable, { InvoiceItemRow } from '../components/InvoiceItemsTable';
 import { formatDateISO, calculateDueDate, formatHKD } from '../utils/format';
@@ -427,6 +428,69 @@ export default function InvoiceEditPage() {
     }
   };
 
+  const handleShare = async () => {
+    if (!existingInvoice && !invoiceId) return;
+    try {
+      const inv = (existingInvoice || await api.invoicesGetById(invoiceId!)) as Record<string, any> | null;
+      if (!inv) return;
+      const customer = (await api.customersGetById(inv.customer_id as number)) as Record<string, any> | null;
+      const pdfSettings = (await api.settingsGet()) as Record<string, any> | null;
+      if (!customer || !pdfSettings) return;
+
+      const { generatePDFBlob } = await import('../utils/pdf');
+      const currentItems = items.length > 0 ? items : (await api.invoiceItemsGetAll(inv.id as number)) as Record<string, any>[];
+      const blob = generatePDFBlob({
+        teacherName: pdfSettings.teacher_name,
+        teacherAddress: pdfSettings.teacher_address,
+        teacherEmail: pdfSettings.teacher_email,
+        teacherPhone: pdfSettings.teacher_phone,
+        brNumber: pdfSettings.br_number,
+        bankDetails: pdfSettings.bank_details,
+        customerName: customer.name,
+        customerAddress: customer.address,
+        invoiceNumber: inv.invoice_number,
+        issueDate: inv.issue_date,
+        dueDate: inv.due_date,
+        subtotal: inv.subtotal,
+        discountPercent: inv.discount_percent,
+        discountAmount: inv.discount_amount,
+        total: inv.total,
+        paymentTerms: inv.payment_terms,
+        notes: inv.notes,
+        items: (currentItems as any[]).map((i: any) => ({
+          description: i.description,
+          lesson_date: i.lesson_date,
+          hours: i.hours,
+          rate: i.rate,
+          amount: i.amount,
+        })),
+        language: (localStorage.getItem('app-language') || 'it') as 'it' | 'en',
+      });
+
+      const file = new File([blob], `${inv.invoice_number}.pdf`, { type: 'application/pdf' });
+      const shareData: ShareData = {
+        title: `${inv.invoice_number} — ${customer.name}`,
+        files: [file],
+      };
+
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: download instead
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${inv.invoice_number}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        setToast({ open: true, message: String(err), severity: 'error' });
+      }
+    }
+  };
+
   const handleDuplicate = async () => {
     if (!existingInvoice) return;
     try {
@@ -491,6 +555,11 @@ export default function InvoiceEditPage() {
             <Button startIcon={<PictureAsPdfIcon />} onClick={() => handleExportPDF(true)}>
               {t('invoices.exportPdf')}
             </Button>
+            {'share' in navigator && (
+              <Button startIcon={<ShareIcon />} onClick={handleShare}>
+                {t('common.share')}
+              </Button>
+            )}
           </>
         )}
       </Box>

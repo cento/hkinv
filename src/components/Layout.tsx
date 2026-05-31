@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   AppBar,
   Box,
+  Button,
   Drawer,
   IconButton,
   List,
@@ -32,7 +33,9 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import BackupIcon from '@mui/icons-material/Backup';
 import SaveIcon from '@mui/icons-material/Save';
 import CloudIcon from '@mui/icons-material/Cloud';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import { useAppContext } from '../contexts/AppContext';
+import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { changeLanguage } from '../i18n/index';
 import { isBackupConfigured, getBackupFileName, getLastBackupTime, triggerBackup } from '../database/backup';
 import { configureBackupLocation } from '../database/fsa';
@@ -113,6 +116,7 @@ export default function Layout({ children }: LayoutProps) {
   const { state, setLanguage, toggleDarkMode } = useAppContext();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [backupToast, setBackupToast] = React.useState<{ open: boolean; message: string; severity: 'success' | 'info' | 'error' }>({ open: false, message: '', severity: 'success' });
+  const { installable, install } = useInstallPrompt();
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -186,6 +190,19 @@ export default function Layout({ children }: LayoutProps) {
           {state.isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
         </IconButton>
       </Box>
+      {installable && (
+        <Box sx={{ px: 2, pb: 2, display: 'flex', justifyContent: 'center' }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<GetAppIcon />}
+            onClick={install}
+            fullWidth
+          >
+            {t('welcome.installApp') || 'Install App'}
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 

@@ -13,6 +13,8 @@ import { hasSettings } from '../database/settings';
 import { runMigrations } from '../database/migrations';
 import { startBackupTimer } from '../database/backup';
 import OnboardingWizard from '../components/OnboardingWizard';
+import { useFileHandler } from '../hooks/useFileHandler';
+import { useInstallPrompt } from '../hooks/useInstallPrompt';
 
 const RECENT_KEY = 'recent-archives';
 const MAX_RECENT = 5;
@@ -37,6 +39,7 @@ export default function WelcomePage() {
   const [recent, setRecent] = useState<{ name: string; lastOpened: string }[]>([]);
   const [activeArchive, setActiveArchive] = useState<string | null>(null);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
+  const { installable, install } = useInstallPrompt();
 
   useEffect(() => {
     hasExistingDB().then(setHasDB);
@@ -46,6 +49,20 @@ export default function WelcomePage() {
       setActiveArchive(files[0].name);
     }
   }, []);
+
+  // File handler: double-click .hkinv in Explorer → import into OPFS
+  useFileHandler(async (handle) => {
+    const file = await handle.getFile();
+    const buffer = await file.arrayBuffer();
+    await importDatabase(buffer);
+    addRecentFile(file.name);
+    setRecent(getRecentFiles());
+    setDbPath(file.name);
+    setDbOpen(true);
+    const complete = hasSettings();
+    setSettingsComplete(complete);
+    if (!complete) setOnboardingOpen(true);
+  });
 
   const afterDbOpen = (fileName?: string) => {
     const db = getDatabase();
@@ -112,6 +129,19 @@ export default function WelcomePage() {
         <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 4 }}>
           {t('app.subtitle')}
         </Typography>
+
+        {installable && (
+          <Button
+            variant="contained"
+            size="large"
+            color="success"
+            onClick={install}
+            sx={{ mb: 2, px: 4, py: 1.5 }}
+            startIcon={<CreateNewFolderIcon />}
+          >
+            {t('welcome.installApp') || 'Install App'}
+          </Button>
+        )}
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontStyle: 'italic' }}>
           {t('welcome.firstRun')}

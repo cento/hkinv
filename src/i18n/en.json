@@ -23,6 +23,7 @@
   "common.pageSize": "Rows per page",
   "common.view": "View",
   "common.print": "Print",
+  "common.share": "Share",
   "common.skip": "Skip",
   "common.review": "Review",
   "common.confirmSave": "Confirm & Save",
@@ -154,6 +155,7 @@
   "invoices.numberAlreadyExists": "This invoice number already exists",
 
   "welcome.firstRun": "To get started, create a new archive or open an existing one.",
+  "welcome.installApp": "Install App",
   "welcome.quickGuide": "Quick guide",
   "welcome.stepCreate": "Create a new archive",
   "welcome.stepDescribe": "This will create a new file where all your invoices and customers are stored. Use the Save button in the toolbar to keep a backup copy in your Documents folder.",
