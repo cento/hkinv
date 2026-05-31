@@ -96,6 +96,12 @@ try {
     [Console]::CancelKeyPress += { Write-Host "`nShutting down..." -ForegroundColor Yellow; $global:running = $false }
 } catch {}
 
+trap {
+    Write-Host "`nShutting down..." -ForegroundColor Yellow
+    $listener.Stop()
+    break
+}
+
 try {
     $listener.Start()
     $url = "http://localhost:$port"
@@ -110,6 +116,12 @@ try {
     Start-Process $url
     
     while ($global:running) {
+        # Wait for a connection — Start-Sleep is interruptible by Ctrl+C
+        while ($global:running -and -not $listener.Pending()) {
+            Start-Sleep -Milliseconds 100
+        }
+        if (-not $global:running) { break }
+        
         try {
             $client = $listener.AcceptTcpClient()
             $stream = $null
@@ -122,7 +134,6 @@ try {
             }
         } catch {
             if (-not $global:running) { break }
-            Start-Sleep -Milliseconds 50
         }
     }
 } finally {
