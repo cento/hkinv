@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.3.0 (2026-06-01)
+
+### PWA — Progressive Web App
+- **Install button**: "Install App" in sidebar and WelcomePage, works even in dev mode via fallback timer
+- **File handler**: double-click `.hkinv` in Explorer → PWA opens and imports the archive automatically
+- **App shortcuts**: right-click on desktop icon → New Invoice, Dashboard, Customers
+- **Web Share API**: "Share" button on invoice page opens native share sheet (email, WhatsApp, etc.) with PDF attached
+- **Service worker**: auto-unregisters on localhost to prevent stale chunk errors, disabled in dev mode
+- **Ctrl+C fix**: server now stops reliably via `CancelKeyPress` handler + `Pending()` polling, no "Terminate batch job?" prompt
+
+### Tests (354 total, +12)
+- `useFileHandler` (4): launch consumer registration, unavailable, file handling, empty files
+- Manifest validation (5): required fields, file_handlers, shortcuts, URLs, icons
+- Web Share API (3): feature detection, canShare, file sharing
+
+---
+
 ## v0.2.0 (2026-06-01)
 
 ### PWA — Progressive Web App
