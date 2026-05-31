@@ -38,17 +38,21 @@ describe('createInvoiceWithNumber', () => {
     expect(num2).toBe(num1 + 1);
   });
 
-  it('should throw after 10 UNIQUE constraint failures', () => {
+  it('skips used numbers when counter is behind existing invoices', () => {
+    // Create 10 invoices manually with raw numbers 0001-0010
     const prefix = 'INV-';
     const year = new Date().getFullYear().toString();
     for (let i = 1; i <= 10; i++) {
       const num = String(i).padStart(4, '0');
       e("INSERT INTO invoices (invoice_number, issue_date, due_date, customer_id, status, currency, subtotal, discount_percent, discount_amount, total, notes, payment_terms, created_at, updated_at) VALUES (?,?,?,?,'draft','HKD',0,0,0,0,null,null,datetime('now'),datetime('now'))", [prefix + year + '-' + num, '2026-06-01', '2026-07-01', cid]);
     }
+    // Reset counter to 1 — all numbers 0001-0010 are taken
     e('UPDATE settings SET invoice_counter = 1 WHERE id = 1');
-    expect(() => {
-      invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
-    }).toThrow('Failed to generate unique invoice number after 10 attempts');
+
+    // Should find the next free number (0011) instead of throwing
+    const id = invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
+    const inv = invoicesDb.getInvoiceById(id, db);
+    expect(inv!.invoice_number).toBe(`${prefix}${year}-0011`);
   });
 });
 
@@ -119,5 +123,62 @@ describe('invoice items edge cases', () => {
     expect(updated!.subtotal).toBe(1000);
     expect(updated!.discount_amount).toBe(100);
     expect(updated!.total).toBe(900);
+  });
+});
+
+describe('generateInvoiceNumber collision handling', () => {
+  it('generates a free number when no invoices exist', () => {
+    // Fresh db, should use counter=1
+    const num = invoicesDb.generateInvoiceNumber(db);
+    expect(num).toMatch(/INV-\d{4}-0001/);
+  });
+
+  it('skips existing invoice numbers to find next free one', () => {
+    // Create first invoice which takes INV-XXXX-0001
+    invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
+
+    // Next generated number should skip 0001 and use 0002
+    const next = invoicesDb.generateInvoiceNumber(db);
+    expect(next).toMatch(/INV-\d{4}-0002/);
+  });
+
+  it('skips multiple existing numbers', () => {
+    // Create invoices at positions 1, 2, 3
+    invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
+    invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
+    invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
+
+    // Next should be 0004
+    const next = invoicesDb.generateInvoiceNumber(db);
+    expect(next).toMatch(/INV-\d{4}-0004/);
+  });
+
+  it('createInvoiceWithNumber never reuses a deleted number', () => {
+    // Create invoice at position 1
+    const id1 = invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
+    const num1 = invoicesDb.getInvoiceById(id1, db)!.invoice_number;
+
+    // Delete it
+    invoicesDb.deleteInvoice(id1, db);
+
+    // Create a new invoice — should NOT reuse the deleted number
+    const id2 = invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
+    const num2 = invoicesDb.getInvoiceById(id2, db)!.invoice_number;
+
+    expect(num2).not.toBe(num1);
+    // Counter should have advanced; 2nd invoice should have a higher number
+    const counter2 = parseInt(num2.split('-')[2], 10);
+    const counter1 = parseInt(num1.split('-')[2], 10);
+    expect(counter2).toBeGreaterThan(counter1);
+  });
+
+  it('handles many collisions gracefully', () => {
+    // Create 5 invoices
+    for (let i = 0; i < 5; i++) {
+      invoicesDb.createInvoiceWithNumber({ customer_id: cid, issue_date: '2026-06-01', due_date: '2026-07-01' }, db);
+    }
+    // Next should be 0006
+    const next = invoicesDb.generateInvoiceNumber(db);
+    expect(next).toMatch(/INV-\d{4}-0006/);
   });
 });

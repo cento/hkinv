@@ -274,8 +274,17 @@ export function calculateTotals(items: { hours: number; rate: number }[]): { sub
 }
 
 /**
- * Generates the NEXT invoice number WITHOUT incrementing the counter.
+ * Returns true if an invoice with the given number already exists.
+ */
+function invoiceNumberExists(conn: SqlJsDatabase, number: string): boolean {
+  const row = q(conn, 'SELECT 1 FROM invoices WHERE invoice_number = ?', [number]);
+  return !!row;
+}
+
+/**
+ * Generates the NEXT FREE invoice number WITHOUT incrementing the counter.
  * The counter is incremented only inside createInvoice on success.
+ * Skips any numbers already used by existing invoices.
  */
 export function generateInvoiceNumber(_db?: SqlJsDatabase): string {
   const conn = _db || getDatabase();
@@ -284,8 +293,19 @@ export function generateInvoiceNumber(_db?: SqlJsDatabase): string {
   const prefix = settings.invoice_prefix;
   const year = new Date().getFullYear().toString();
   const row = q(conn, 'SELECT invoice_counter FROM settings WHERE id = 1');
-  const counter = row ? (row.invoice_counter as number) : 1;
-  return `${prefix}${year}-${String(counter).padStart(4, '0')}`;
+  let counter = row ? (row.invoice_counter as number) : 1;
+
+  // Find the next free number, skipping any already in use
+  const MAX_ATTEMPTS = 100;
+  for (let i = 0; i < MAX_ATTEMPTS; i++) {
+    const candidate = `${prefix}${year}-${String(counter).padStart(4, '0')}`;
+    if (!invoiceNumberExists(conn, candidate)) {
+      return candidate;
+    }
+    counter++;
+  }
+
+  throw new Error('Failed to generate a free invoice number after 100 attempts');
 }
 
 /**
