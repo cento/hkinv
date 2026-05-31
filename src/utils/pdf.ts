@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import { formatHKD } from './format';
 import autoTable from 'jspdf-autotable';
 
 export interface PDFData {
@@ -119,7 +120,7 @@ export function generateMonthlyReport(data: MonthlyReportData, language: 'it' | 
   doc.text(data.teacherName, 50, 47);
 
   const tHeaders = [l.invoiceNo, language === 'it' ? 'Cliente' : 'Customer', l.date, l.total, language === 'it' ? 'Stato' : 'Status'];
-  const tRows = data.rows.map(r => [r.invoiceNumber, r.customerName, r.issueDate, r.total.toFixed(2) + ' HKD', r.status]);
+  const tRows = data.rows.map(r => [r.invoiceNumber, r.customerName, r.issueDate, formatHKD(r.total), r.status]);
 
   autoTable(doc, {
     startY: 60,
@@ -135,7 +136,7 @@ export function generateMonthlyReport(data: MonthlyReportData, language: 'it' | 
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text(language === 'it' ? 'TOTALE ENTRATE:' : 'TOTAL REVENUE:', 110, finalY);
-  doc.text(data.totalRevenue.toFixed(2) + ' HKD', 190, finalY, { align: 'right' });
+  doc.text(formatHKD(data.totalRevenue), 190, finalY, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
@@ -257,19 +258,19 @@ export function generatePDF(data: PDFData): jsPDF {
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(`${l.subtotal}:`, 110, finalY);
-  doc.text(`${data.subtotal.toFixed(2)} HKD`, 190, finalY, { align: 'right' });
+  doc.text(formatHKD(data.subtotal), 190, finalY, { align: 'right' });
 
   if (data.discountPercent > 0) {
     const discountY = finalY + 7;
     doc.text(`${l.discount} (${data.discountPercent}%):`, 110, discountY);
-    doc.text(`-${data.discountAmount.toFixed(2)} HKD`, 190, discountY, { align: 'right' });
+    doc.text(`-${formatHKD(data.discountAmount)}`, 190, discountY, { align: 'right' });
   }
 
   const totalY = finalY + (data.discountPercent > 0 ? 14 : 7);
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.text(`${l.total}:`, 110, totalY);
-  doc.text(`${data.total.toFixed(2)} HKD`, 190, totalY, { align: 'right' });
+  doc.text(formatHKD(data.total), 190, totalY, { align: 'right' });
 
   // --- Footer ---
   let footerY = totalY + 15;

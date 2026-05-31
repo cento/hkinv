@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import api from '../services/dbService';
+import { formatHKD } from '../utils/format';
 
 export interface InvoiceItemRow {
   tempId: number;
@@ -163,7 +164,7 @@ export default function InvoiceItemsTable({ items, onChange, customerId, readOnl
                       sx={{ width: 90 }} slotProps={{ htmlInput: { min: 0, step: 50 } }} />
                   </TableCell>
                   <TableCell align="right">
-                    {item.amount.toFixed(2)}
+                    {formatHKD(item.amount)}
                   </TableCell>
                   {!readOnly && (
                     <TableCell align="center">

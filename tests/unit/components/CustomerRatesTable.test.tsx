@@ -21,7 +21,7 @@ describe('CustomerRatesTable', () => {
   it('renders rates list', async () => {
     render(React.createElement(CustomerRatesTable, { customerId: 1 }));
     await waitFor(() => expect(screen.getByText('Lesson')).toBeInTheDocument(), { timeout: 5000 });
-    expect(screen.getByText('450.00 HKD')).toBeInTheDocument();
+    expect(screen.getByText('HK$450.00')).toBeInTheDocument();
   });
 
   it('shows add rate dialog', async () => {

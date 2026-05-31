@@ -4,6 +4,7 @@ import { Box, Typography, Button, Snackbar, Alert } from '@mui/material';
 import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import api from '../services/dbService';
+import { formatHKD } from '../utils/format';
 import ServiceTypeDialog, { ServiceTypeFormData } from '../components/ServiceTypeDialog';
 import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
 
@@ -76,7 +77,7 @@ export default function ServiceTypesPage() {
     { field: 'description_template', headerName: t('serviceTypes.description'), flex: 2 },
     {
       field: 'default_rate', headerName: t('serviceTypes.rate'), flex: 1,
-      valueFormatter: (val: number) => `${val?.toFixed(2)} HKD`,
+      valueFormatter: (val: number) => formatHKD(val || 0),
     },
     { field: 'default_hours', headerName: t('serviceTypes.hours'), flex: 0.5 },
     {

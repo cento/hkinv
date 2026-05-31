@@ -32,7 +32,7 @@ describe('InvoiceItemsTable', () => {
     expect(screen.getByDisplayValue('Test lesson')).toBeInTheDocument();
     expect(screen.getByDisplayValue('2')).toBeInTheDocument();
     expect(screen.getByDisplayValue('500')).toBeInTheDocument();
-    expect(screen.getByText('1000.00')).toBeInTheDocument();
+    expect(screen.getByText('HK$1,000.00')).toBeInTheDocument();
   });
 
   it('calls onChange when adding item', () => {

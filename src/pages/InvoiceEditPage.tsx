@@ -13,7 +13,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import api from '../services/dbService';
 import InvoiceItemsTable, { InvoiceItemRow } from '../components/InvoiceItemsTable';
-import { formatDateISO, calculateDueDate } from '../utils/format';
+import { formatDateISO, calculateDueDate, formatHKD } from '../utils/format';
 import { validateInvoice, validateInvoiceItem } from '../utils/validators';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PDFPreviewDialog from '../components/PDFPreviewDialog';
@@ -568,16 +568,16 @@ export default function InvoiceEditPage() {
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Box sx={{ textAlign: 'right', minWidth: 250 }}>
                 <Typography variant="body2" color="text.secondary">
-                  {t('invoices.subtotal')}: {subtotal.toFixed(2)} HKD
+                  {t('invoices.subtotal')}: {formatHKD(subtotal)}
                 </Typography>
                 {discountPercent > 0 && (
                   <Typography variant="body2" color="error">
-                    {t('invoices.discount')} ({discountPercent}%): -{discountAmount.toFixed(2)} HKD
+                    {t('invoices.discount')} ({discountPercent}%): -{formatHKD(discountAmount)}
                   </Typography>
                 )}
                 <Divider sx={{ my: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {t('invoices.total')}: {total.toFixed(2)} HKD
+                  {t('invoices.total')}: {formatHKD(total)}
                 </Typography>
               </Box>
             </Box>
@@ -640,16 +640,16 @@ export default function InvoiceEditPage() {
             <strong>{t('invoices.items')}:</strong> {items.length}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1 }}>
-            <strong>{t('invoices.subtotal')}:</strong> {subtotal.toFixed(2)} HKD
+            <strong>{t('invoices.subtotal')}:</strong> {formatHKD(subtotal)}
           </Typography>
           {discountPercent > 0 && (
             <Typography variant="body2" sx={{ mb: 1 }}>
-              <strong>{t('invoices.discount')}:</strong> {discountPercent}% (-{discountAmount.toFixed(2)} HKD)
+              <strong>{t('invoices.discount')}:</strong> {discountPercent}% (-{formatHKD(discountAmount)})
             </Typography>
           )}
           <Divider sx={{ my: 1 }} />
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            {t('invoices.total')}: {total.toFixed(2)} HKD
+            {t('invoices.total')}: {formatHKD(total)}
           </Typography>
         </DialogContent>
         <DialogActions>

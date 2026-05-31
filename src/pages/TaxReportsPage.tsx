@@ -10,6 +10,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import api from '../services/dbService';
 import { downloadBlob } from '../database/fsa';
 import { formatError } from '../utils/validators';
+import { formatHKD } from '../utils/format';
 
 function getTaxYear(year: number): { start: string; end: string } {
   return {
@@ -119,10 +120,10 @@ export default function TaxReportsPage() {
         i.invoice_number,
         i.customer_name || '',
         i.paid_date || i.issue_date,
-        `${(i.total || 0).toFixed(2)} HKD`,
+        formatHKD(i.total || 0),
       ]);
       body.push(['', '', '', '']);
-      body.push([t('dashboard.totalInvoices') || 'Total', '', '', `${summary.totalIncome.toFixed(2)} HKD`]);
+      body.push([t('dashboard.totalInvoices') || 'Total', '', '', formatHKD(summary.totalIncome)]);
 
       autoTable(doc, {
         startY: y,
@@ -176,7 +177,7 @@ export default function TaxReportsPage() {
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>{summary.totalIncome.toFixed(2)} HKD</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>{formatHKD(summary.totalIncome)}</Typography>
             <Typography variant="body2" color="text.secondary">{t('dashboard.monthlyTotal')}</Typography>
           </Paper>
         </Grid>
@@ -228,13 +229,13 @@ export default function TaxReportsPage() {
             ) : data.map((r, i) => (
               <TableRow key={i}>
                 <TableCell>{r.customer_name}</TableCell>
-                <TableCell align="right">{r.total.toFixed(2)} HKD</TableCell>
+                <TableCell align="right">{formatHKD(r.total)}</TableCell>
                 <TableCell align="right">{r.count}</TableCell>
               </TableRow>
             ))}
             <TableRow>
               <TableCell sx={{ fontWeight: 700 }}>{t('dashboard.totalInvoices')}</TableCell>
-              <TableCell align="right" sx={{ fontWeight: 700 }}>{summary.totalIncome.toFixed(2)} HKD</TableCell>
+              <TableCell align="right" sx={{ fontWeight: 700 }}>{formatHKD(summary.totalIncome)}</TableCell>
               <TableCell align="right" sx={{ fontWeight: 700 }}>{summary.totalInvoices}</TableCell>
             </TableRow>
           </TableBody>
@@ -260,7 +261,7 @@ export default function TaxReportsPage() {
                     <TableCell>{inv.invoice_number}</TableCell>
                     <TableCell>{inv.customer_name || `#${inv.customer_id}`}</TableCell>
                     <TableCell>{inv.paid_date || inv.issue_date}</TableCell>
-                    <TableCell align="right">{(inv.total || 0).toFixed(2)} HKD</TableCell>
+                    <TableCell align="right">{formatHKD(inv.total || 0)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

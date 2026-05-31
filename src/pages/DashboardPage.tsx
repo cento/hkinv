@@ -10,6 +10,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import api from '../services/dbService';
+import { formatHKD } from '../utils/format';
 import { EmptyState } from '../components/ConfirmDialog';
 import { useAppContext } from '../contexts/AppContext';
 import { getBackupFileName, isBackupConfigured } from '../database/backup';
@@ -135,7 +136,7 @@ export default function DashboardPage() {
           <StatCard icon={<ReceiptLongIcon sx={{ fontSize: 40 }} />} label={t('dashboard.totalInvoices')} value={stats.totalInvoices} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <StatCard icon={<PaymentsIcon sx={{ fontSize: 40 }} />} label={t('dashboard.monthlyTotal')} value={`${stats.monthlyTotal.toFixed(0)} HKD`} color="success.main" />
+          <StatCard icon={<PaymentsIcon sx={{ fontSize: 40 }} />} label={t('dashboard.monthlyTotal')} value={formatHKD(stats.monthlyTotal)} color="success.main" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <StatCard icon={<PeopleIcon sx={{ fontSize: 40 }} />} label={t('dashboard.customers')} value={stats.customerCount} />
@@ -186,7 +187,7 @@ export default function DashboardPage() {
               onClick={() => navigate(`/invoices/${inv.id}`)}>
               <Typography variant="body2">{inv.invoice_number} — {inv.customer_name || `#${inv.customer_id}`}</Typography>
               <Typography variant="body2" color="error">
-                {t('invoices.dueDate')}: {inv.due_date} — {inv.total?.toFixed(2)} HKD
+                {t('invoices.dueDate')}: {inv.due_date} — {formatHKD(inv.total || 0)}
               </Typography>
             </Box>
           ))}

@@ -26,7 +26,7 @@ describe('TaxReportsPage', () => {
   it('renders title and stats', async () => {
     renderPage();
     await waitFor(() => expect(screen.getByText('pdf.taxReport')).toBeInTheDocument(), { timeout: 5000 });
-    const amounts = screen.getAllByText(/3000\.00/);
+    const amounts = screen.getAllByText(/3,000\.00/);
     expect(amounts.length).toBeGreaterThanOrEqual(1);
     const twos = screen.getAllByText('2');
     expect(twos.length).toBeGreaterThanOrEqual(1);

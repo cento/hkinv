@@ -5,6 +5,7 @@ import { Box, Typography, Button, Paper, Grid, Tabs, Tab, Snackbar, Alert } from
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import api from '../services/dbService';
+import { formatHKD } from '../utils/format';
 import CustomerDialog, { CustomerFormData } from '../components/CustomerDialog';
 import CustomerRatesTable from '../components/CustomerRatesTable';
 
@@ -106,7 +107,7 @@ export default function CustomerDetailPage() {
                 onClick={() => navigate(`/invoices/${inv.id}`)}>
                 <Typography><strong>{inv.invoice_number}</strong></Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {inv.issue_date} — {inv.total?.toFixed(2)} HKD — {t(`invoices.${inv.status}`)}
+                  {inv.issue_date} — {formatHKD(inv.total || 0)} — {t(`invoices.${inv.status}`)}
                 </Typography>
               </Paper>
             ))

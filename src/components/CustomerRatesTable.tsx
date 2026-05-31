@@ -9,6 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import api from '../services/dbService';
+import { formatHKD } from '../utils/format';
 import ConfirmDialog from './ConfirmDialog';
 
 interface Props {
@@ -109,7 +110,7 @@ export default function CustomerRatesTable({ customerId }: Props) {
               {rates.map(rate => (
                 <TableRow key={rate.id}>
                   <TableCell>{rate.service_name}</TableCell>
-                  <TableCell align="right">{rate.custom_rate.toFixed(2)} HKD</TableCell>
+                  <TableCell align="right">{formatHKD(rate.custom_rate)}</TableCell>
                   <TableCell align="center">
                     <IconButton size="small" color="error" onClick={() => handleDelete(rate.id)} aria-label={t('common.delete')}>
                       <DeleteIcon fontSize="small" />

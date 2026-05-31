@@ -11,6 +11,7 @@ import api from '../services/dbService';
 import InvoiceFilters, { FilterValues, defaultFilters } from '../components/InvoiceFilters';
 import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
 import { downloadBlob } from '../database/fsa';
+import { formatHKD } from '../utils/format';
 
 const statusColors: Record<string, 'default' | 'primary' | 'success' | 'error' | 'warning'> = {
   draft: 'default',
@@ -222,7 +223,7 @@ export default function InvoicesPage() {
     { field: 'due_date', headerName: t('invoices.dueDate'), flex: 1, minWidth: 100 },
     {
       field: 'total', headerName: t('invoices.total'), flex: 1, minWidth: 100,
-      valueFormatter: (val: number) => `${val?.toFixed(2)} HKD`,
+      valueFormatter: (val: number) => formatHKD(val || 0),
     },
     {
       field: 'status', headerName: t('invoices.status'), flex: 0.8, minWidth: 90,
@@ -335,7 +336,7 @@ export default function InvoicesPage() {
       <ConfirmDialog
         open={!!deleteConfirm}
         title={t('invoices.deleteConfirm')}
-        message={deleteConfirm ? `${deleteConfirm.invoice_number} — ${t('invoices.total')}: ${deleteConfirm.total?.toFixed(2)} HKD` : ''}
+        message={deleteConfirm ? `${deleteConfirm.invoice_number} — ${t('invoices.total')}: ${formatHKD(deleteConfirm.total || 0)}` : ''}
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm(null)}
       />
