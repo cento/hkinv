@@ -17,6 +17,7 @@ $mimeTypes = @{
     '.svg'  = 'image/svg+xml'
     '.ico'  = 'image/x-icon'
     '.json' = 'application/json'
+    '.webmanifest' = 'application/manifest+json'
     '.map'  = 'application/json'
 }
 
@@ -88,6 +89,13 @@ function Serve-Request($stream, $distDir, $mimeTypes) {
 
 $listener = New-Object System.Net.Sockets.TcpListener($address, $port)
 
+# Ctrl+C graceful shutdown
+$global:running = $true
+[Console]::TreatControlCAsInput = $false
+try {
+    [Console]::CancelKeyPress += { Write-Host "`nShutting down..." -ForegroundColor Yellow; $global:running = $false }
+} catch {}
+
 try {
     $listener.Start()
     $url = "http://localhost:$port"
@@ -104,7 +112,7 @@ try {
     $acceptPending = $false
     $asyncResult = $null
     
-    while ($true) {
+    while ($global:running) {
         if (-not $acceptPending) {
             try {
                 $asyncResult = $listener.BeginAcceptTcpClient($null, $null)
@@ -141,5 +149,5 @@ try {
         try { $listener.EndAcceptTcpClient($asyncResult) } catch {}
     }
     $listener.Stop()
-    Write-Host "Server stopped." -ForegroundColor Gray
+    Write-Host "`nServer stopped." -ForegroundColor Gray
 }
