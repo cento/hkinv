@@ -37,7 +37,6 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import { useAppContext } from '../contexts/AppContext';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
-import appVersion from '../../package.json';
 import { changeLanguage } from '../i18n/index';
 import { isBackupConfigured, getBackupFileName, getLastBackupTime, triggerBackup } from '../database/backup';
 import { configureBackupLocation } from '../database/fsa';
@@ -208,7 +207,7 @@ export default function Layout({ children }: LayoutProps) {
       )}
       <Box sx={{ px: 2, pb: 2, display: 'flex', justifyContent: 'center' }}>
         <Typography variant="caption" color="text.disabled">
-          v{appVersion.version}
+          {__APP_VERSION__}
         </Typography>
       </Box>
     </Box>
