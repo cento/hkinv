@@ -13,6 +13,9 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,wasm,png,svg,json}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB for sql-wasm
       },
+      devOptions: {
+        enabled: false, // Disable SW in dev mode — prevents stale chunk errors
+      },
     }),
   ],
   base: './',
