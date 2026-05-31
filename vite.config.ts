@@ -5,7 +5,13 @@ function getVersion(): string {
   try {
     return execSync('git describe --tags --abbrev=0', { encoding: 'utf8' }).trim();
   } catch {
-    return '0.0.0';
+    // Fallback: read from package.json (CI may not have git tags)
+    try {
+      const pkg = require('./package.json');
+      return `v${pkg.version}`;
+    } catch {
+      return 'v0.0.0';
+    }
   }
 }
 import react from '@vitejs/plugin-react';
