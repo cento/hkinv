@@ -4,6 +4,7 @@ import {
   validateCustomer,
   validateInvoice,
   validateInvoiceItem,
+  formatError,
 } from '../../../src/utils/validators';
 
 describe('validateSettings', () => {
@@ -171,5 +172,31 @@ describe('validateSettings phone and BR', () => {
       br_number: 'BR12345678',
     });
     expect(result.valid).toBe(true);
+  });
+});
+
+describe('formatError', () => {
+  it('returns Error.message for Error instances', () => {
+    expect(formatError(new Error('Something broke'))).toBe('Something broke');
+  });
+
+  it('returns string as-is', () => {
+    expect(formatError('Plain error')).toBe('Plain error');
+  });
+
+  it('JSON stringifies objects', () => {
+    expect(formatError({ code: 500 })).toBe('{"code":500}');
+  });
+
+  it('returns String() for unknown types', () => {
+    expect(formatError(42)).toBe('42');
+  });
+
+  it('handles circular objects gracefully', () => {
+    const obj: any = { a: 1 };
+    obj.self = obj;
+    const result = formatError(obj);
+    // Should not throw
+    expect(typeof result).toBe('string');
   });
 });
