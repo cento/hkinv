@@ -1,6 +1,6 @@
 {
   "name": "hkinv",
-  "version": "0.3.1",
+  "version": "0.3.0",
   "description": "Invoice manager for freelance teachers in Hong Kong",
   "private": true,
   "type": "module",
