@@ -13,6 +13,7 @@ import ConfirmDialog, { EmptyState } from '../components/ConfirmDialog';
 import { downloadBlob } from '../database/fsa';
 import { formatError } from '../utils/validators';
 import { formatHKD } from '../utils/format';
+import { useUndoDelete } from '../hooks/useUndoDelete';
 
 const statusColors: Record<string, 'default' | 'primary' | 'success' | 'error' | 'warning'> = {
   draft: 'default',
@@ -170,13 +171,32 @@ export default function InvoicesPage() {
     }
   };
 
+  const undoDelete = useUndoDelete(async (invoice: Record<string, any>) => {
+    await api.invoicesCreate({
+      issue_date: invoice.issue_date,
+      due_date: invoice.due_date,
+      customer_id: invoice.customer_id,
+      status: invoice.status || 'draft',
+      currency: invoice.currency || 'HKD',
+      invoice_number: invoice.invoice_number,
+      subtotal: invoice.subtotal || 0,
+      discount_percent: invoice.discount_percent || 0,
+      discount_amount: invoice.discount_amount || 0,
+      total: invoice.total || 0,
+      notes: invoice.notes || null,
+      payment_terms: invoice.payment_terms || null,
+    });
+    await loadInvoices();
+  });
+
   const handleDelete = async () => {
     if (!deleteConfirm) return;
+    const deleted = { ...deleteConfirm };
     try {
       await api.invoicesDelete(deleteConfirm.id);
       setDeleteConfirm(null);
       await loadInvoices();
-      setToast({ open: true, message: t('common.delete') + ' ✓', severity: 'success' });
+      undoDelete.scheduleUndo(deleted, t('common.delete') + ' ✓');
     } catch (err: any) {
       setDeleteConfirm(null);
       setToast({ open: true, message: String(err), severity: 'error' });
@@ -346,6 +366,16 @@ export default function InvoicesPage() {
         onClose={() => setToast(t => ({ ...t, open: false }))}>
         <Alert severity={toast.severity} variant="filled">{toast.message}</Alert>
       </Snackbar>
+
+      <Snackbar open={undoDelete.snackbar.open} autoHideDuration={5000}
+        onClose={undoDelete.closeSnackbar}
+        message={undoDelete.snackbar.message}
+        action={
+          <Button color="inherit" size="small" onClick={undoDelete.handleUndo}>
+            {t('common.undo') || 'Undo'}
+          </Button>
+        }
+      />
     </Box>
   );
 }
