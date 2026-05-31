@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.1.7 (2026-06-01)
+
+### Major
+- **HK$ currency formatting everywhere**: all amounts now show `HK$1,500.00` (with proper grouping) instead of `1500.00 HKD`
+- **Invoice number collision detection**: `generateInvoiceNumber` now checks existing invoices before assigning a number — deleted numbers are never reused
+- **Undo delete for invoices**: after deleting an invoice, a snackbar with "Undo" button appears for 5 seconds to recover the deleted invoice
+- **Error handling**: all `console.error` catch blocks now show user-facing toast notifications via `formatError()`
+
+### Tests (342 total, +15)
+- `formatError` (5): Error.message, strings, JSON objects, numbers, circular references
+- `useUndoDelete` hook (5): schedule, undo, timeout, close, no-op safety
+- Invoice number collision (5): free number, skip existing, skip multiple, never reuse deleted, many collisions
+
+---
+
 ## v0.1.6 (2026-05-31)
 
 ### Major Features
