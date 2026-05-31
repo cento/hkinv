@@ -61,13 +61,15 @@ jobs:
           name: hkinv-webapp
           path: .
 
-      - run: unzip hkinv-webapp.zip -d _site
+      - run: |
+          unzip hkinv-webapp.zip
+          mv hkinv-webapp/dist _site
 
       - uses: actions/configure-pages@v4
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: '_site/dist'
+          path: '_site'
 
       - id: deployment
         uses: actions/deploy-pages@v4
