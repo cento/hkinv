@@ -98,8 +98,9 @@ try {
 
 trap {
     Write-Host "`nShutting down..." -ForegroundColor Yellow
+    $global:running = $false
     $listener.Stop()
-    break
+    continue
 }
 
 try {
@@ -139,4 +140,5 @@ try {
 } finally {
     $listener.Stop()
     Write-Host "`nServer stopped." -ForegroundColor Gray
+    Read-Host "Press Enter to close"
 }
