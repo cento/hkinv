@@ -10,6 +10,14 @@
 </head>
 <body>
   <div id="root"></div>
+  <script>
+    // Clean up service worker from production builds when running in dev mode
+    if (location.hostname === 'localhost' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => reg.unregister());
+      });
+    }
+  </script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
