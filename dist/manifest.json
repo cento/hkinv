@@ -18,5 +18,34 @@
       "sizes": "512x512",
       "type": "image/png"
     }
+  ],
+  "file_handlers": [
+    {
+      "action": "./#/open-file",
+      "accept": {
+        "application/octet-stream": [".hkinv"]
+      },
+      "icons": [
+        { "src": "icon-192.png", "sizes": "192x192" }
+      ]
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Invoice",
+      "short_name": "Invoice",
+      "url": "./#/invoices/new",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Dashboard",
+      "url": "./#/dashboard",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Customers",
+      "url": "./#/customers",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
   ]
 }

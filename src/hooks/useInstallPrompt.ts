@@ -1,29 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+declare global {
+  interface BeforeInstallPromptEvent extends Event {
+    prompt: () => Promise<void>;
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+  }
+}
 
 /**
  * Captures the beforeinstallprompt event and provides a way to trigger installation.
+ * In dev mode (no SW), shows install button after a short delay so user can still install via Chrome menu.
  * Returns { installable, install } — call install() when user clicks the install button.
  */
-export function useInstallPrompt(): { installable: boolean; install: () => Promise<void> } {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+export function useInstallPrompt(): { installable: boolean; install: () => void } {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showFallback, setShowFallback] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      setShowFallback(false);
     };
     window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+
+    // Fallback: if beforeinstallprompt doesn't fire within 3 seconds,
+    // show the install button anyway (useful in dev mode or when SW is disabled)
+    const timer = setTimeout(() => {
+      setShowFallback(true);
+    }, 3000);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      clearTimeout(timer);
+    };
   }, []);
 
-  const install = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    setDeferredPrompt(null);
-    // If user dismissed the prompt, it's gone — Chrome won't show it again soon
-    return outcome;
-  };
+  const install = useCallback(() => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+    } else {
+      // Fallback: tell user to use Chrome menu → Install
+      alert('Click the ⋮ menu in Chrome and select "Install HK Invoice Manager..."');
+    }
+  }, [deferredPrompt]);
 
-  return { installable: !!deferredPrompt, install };
+  const installable = !!deferredPrompt || showFallback;
+
+  return { installable, install };
 }
