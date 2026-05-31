@@ -2,6 +2,10 @@
 
 Invoice management for freelance teachers in Hong Kong. Browser-based web app to create, manage, and export HKD invoices for lessons at private schools. Compliant with Hong Kong IRD requirements. Bilingual Italian/English.
 
+**🆕 PWA — install as a desktop app!** Open the app in Chrome/Edge and click "Install" in the address bar.
+
+**🌐 Online:** [cento.github.io/hkinv](https://cento.github.io/hkinv/) — no download needed.
+
 ## Features
 
 ### Invoices
@@ -97,9 +101,15 @@ Invoice management for freelance teachers in Hong Kong. Browser-based web app to
 | i18n | react-i18next + i18next |
 | Routing | react-router-dom v7 (HashRouter) |
 | Build | Vite 6 |
-| Tests | Vitest (327 unit tests) |
+| Tests | Vitest (342 unit tests) |
 
-## Quick Start (Windows)
+## Quick Start
+
+### Online (no download)
+
+Open **[cento.github.io/hkinv](https://cento.github.io/hkinv/)** in Chrome or Edge. Click **"Install"** in the address bar to add it to your desktop.
+
+### Windows (offline)
 
 Download the latest `hkinv-webapp.zip` from the [releases page](https://github.com/cento/hkinv/releases), extract it, and double-click `hkinv.bat`. The browser opens with the app running on `http://localhost:5173`.
 

@@ -6,7 +6,6 @@ yarn-error.log*
 
 # === Build output ===
 out/
-dist/
 .vite/
 
 # === OS files ===

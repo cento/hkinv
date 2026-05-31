@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.2.0 (2026-06-01)
+
+### PWA — Progressive Web App
+- **Installable**: manifest.json + service worker — install as standalone desktop app from Chrome/Edge
+- **Offline support**: Workbox precaches all 30 assets (2.7 MB including sql.js WASM)
+- **Auto-update**: new version downloads in background, applied on next refresh
+- **Icons**: 192×192 and 512×512 blue PNG icons
+- **Theme**: standalone display mode, theme color #1a73e8, dark background
+- **Ctrl+C fix**: serve.ps1 now stops gracefully with Ctrl+C
+
+---
+
 ## v0.1.7 (2026-06-01)
 
 ### Major

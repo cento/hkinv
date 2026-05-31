@@ -1,0 +1,1 @@
+function r(t){return`HK$${t.toLocaleString("en-HK",{minimumFractionDigits:2,maximumFractionDigits:2})}`}function o(t){return t.split("T")[0]}function i(){return new Date().toISOString().split("T")[0]}function c(t){if(!t)return i();const a=t.match(/(\d+)/),e=a?parseInt(a[1],10):30,n=new Date;return n.setDate(n.getDate()+e),n.toISOString().split("T")[0]}export{r as a,c,o as f};
