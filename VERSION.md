@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.3.1 (2026-06-01)
+
+### PWA UX
+- **Version display**: current git tag shown at bottom of sidebar (auto-detected at build time)
+- **Update notification**: banner appears when a new version is available via service worker, with "Update" button to reload
+- **Install button**: appears in sidebar and WelcomePage, works even in dev mode via fallback timer
+- **Service worker**: auto-unregisters on localhost to prevent stale chunk errors, disabled in dev mode
+
+### Server reliability
+- **Ctrl+C fix**: server stops reliably — `CancelKeyPress` handler + `Pending()` polling
+- **hkinv.bat**: launches PowerShell in own window, no "Terminate batch job?" prompt
+- **serve.ps1**: `Read-Host` keeps window open after shutdown, cleaner Ctrl+C handling
+
+---
+
 ## v0.3.0 (2026-06-01)
 
 ### PWA — Progressive Web App
