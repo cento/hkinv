@@ -1,34 +1,21 @@
 # Changelog
 
-## v0.3.1 (2026-06-01)
+## v0.3.2 (2026-06-07)
 
-### PWA UX
-- **Version display**: current git tag shown at bottom of sidebar (auto-detected at build time)
-- **Update notification**: banner appears when a new version is available via service worker, with "Update" button to reload
-- **Install button**: appears in sidebar and WelcomePage, works even in dev mode via fallback timer
-- **Service worker**: auto-unregisters on localhost to prevent stale chunk errors, disabled in dev mode
+### Fixes
+- **Page size warning**: DataGrid pageSizeOptions now include 100 to match default page size
+- **Invoice counter field**: added to Settings page UI (was only in DB)
+- **Version display**: now uses git tag for version in sidebar
+- **Update notification**: shows banner when a new version is available
+- **Ctrl+C graceful shutdown**: serve.ps1 now stops cleanly
+- **Install button**: always visible via fallback, added to sidebar
+- **Production SW**: auto-unregistered when running on localhost
+- **i18n**: added `wizard.invoiceCounter` key (IT/EN)
 
-### Server reliability
-- **Ctrl+C fix**: server stops reliably — `CancelKeyPress` handler + `Pending()` polling
-- **hkinv.bat**: launches PowerShell in own window, no "Terminate batch job?" prompt
-- **serve.ps1**: `Read-Host` keeps window open after shutdown, cleaner Ctrl+C handling
-
----
-
-## v0.3.0 (2026-06-01)
-
-### PWA — Progressive Web App
-- **Install button**: "Install App" in sidebar and WelcomePage, works even in dev mode via fallback timer
-- **File handler**: double-click `.hkinv` in Explorer → PWA opens and imports the archive automatically
-- **App shortcuts**: right-click on desktop icon → New Invoice, Dashboard, Customers
-- **Web Share API**: "Share" button on invoice page opens native share sheet (email, WhatsApp, etc.) with PDF attached
-- **Service worker**: auto-unregisters on localhost to prevent stale chunk errors, disabled in dev mode
-- **Ctrl+C fix**: server now stops reliably via `CancelKeyPress` handler + `Pending()` polling, no "Terminate batch job?" prompt
-
-### Tests (354 total, +12)
-- `useFileHandler` (4): launch consumer registration, unavailable, file handling, empty files
-- Manifest validation (5): required fields, file_handlers, shortcuts, URLs, icons
-- Web Share API (3): feature detection, canShare, file sharing
+### Tests (354 total)
+- Vitest `__APP_VERSION__` global now defined in vitest.config.ts
+- Version verification test added
+- All 354 tests passing, 0 ESLint errors, 0 TSC errors
 
 ---
 

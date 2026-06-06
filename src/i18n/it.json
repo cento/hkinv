@@ -61,6 +61,7 @@
   "wizard.brNumber": "Business Registration Number (BR)",
   "wizard.brNumberHelp": "Opzionale — richiesto per alcune scuole",
   "wizard.invoicePrefix": "Prefisso fattura",
+  "wizard.invoiceCounter": "Contatore fatture",
   "wizard.bankDetails": "Coordinate bancarie",
   "wizard.paymentTerms": "Termini di pagamento",
   "wizard.finish": "Completa configurazione",

@@ -110,6 +110,9 @@ export default function SettingsPage() {
             <TextField fullWidth label={t('wizard.paymentTerms')} value={form.default_payment_terms} onChange={e => setForm(f => ({ ...f, default_payment_terms: e.target.value }))} helperText={t('wizard.paymentTermsHelp')} />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
+            <TextField fullWidth type="number" label={t('wizard.invoiceCounter')} value={form.invoice_counter} onChange={e => setForm(f => ({ ...f, invoice_counter: parseInt(e.target.value) || 0 }))} slotProps={{ htmlInput: { min: 1 } }} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
             <TextField fullWidth label={t('wizard.bankDetails')} value={form.bank_details} onChange={e => setForm(f => ({ ...f, bank_details: e.target.value }))} multiline rows={2} />
           </Grid>
         </Grid>

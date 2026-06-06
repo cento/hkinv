@@ -6,12 +6,11 @@ function getVersion(): string {
   try {
     return execSync('git describe --tags --abbrev=0', { encoding: 'utf8' }).trim();
   } catch {
-    // Fallback: read from package.json (CI may not have git tags)
     try {
       const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
       return `v${pkg.version}`;
     } catch {
-      return 'v0.0.0';
+      return '0.0.0';
     }
   }
 }
