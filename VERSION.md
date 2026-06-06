@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.3.2 (2026-06-07)
+
+### Fixes
+- **Page size warning**: DataGrid pageSizeOptions now include 100 to match default page size
+- **Invoice counter field**: added to Settings page UI (was only in DB)
+- **Version display**: now uses git tag for version in sidebar
+- **Update notification**: shows banner when a new version is available
+- **Ctrl+C graceful shutdown**: serve.ps1 now stops cleanly
+- **Install button**: always visible via fallback, added to sidebar
+- **Production SW**: auto-unregistered when running on localhost
+- **i18n**: added `wizard.invoiceCounter` key (IT/EN)
+
+### Tests (354 total)
+- Vitest `__APP_VERSION__` global now defined in vitest.config.ts
+- Version verification test added
+- All 354 tests passing, 0 ESLint errors, 0 TSC errors
+
+---
+
 ## v0.2.0 (2026-06-01)
 
 ### PWA — Progressive Web App

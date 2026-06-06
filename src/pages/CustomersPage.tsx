@@ -73,7 +73,7 @@ export default function CustomersPage() {
           rows={customers}
           columns={columns}
           loading={loading}
-          pageSizeOptions={[25, 50]}
+          pageSizeOptions={[25, 50, 100]}
           disableRowSelectionOnClick
           onRowClick={handleRowClick}
           slots={{ noRowsOverlay: EmptyState }}

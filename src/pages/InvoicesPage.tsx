@@ -344,7 +344,7 @@ export default function InvoicesPage() {
           rows={displayedInvoices}
           columns={columns}
           loading={loading}
-          pageSizeOptions={[25, 50]}
+           pageSizeOptions={[25, 50, 100]}
           checkboxSelection
           disableRowSelectionOnClick
           onRowSelectionModelChange={setSelectedIds}
