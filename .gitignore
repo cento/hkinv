@@ -43,6 +43,8 @@ __pycache__/
 
 # === Playwright ===
 test-results/
+playwright-report/
+.playwright-mcp/
 
 # === Project instructions (opencode) ===
 AGENTS.md

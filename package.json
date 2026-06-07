@@ -1,6 +1,6 @@
 {
   "name": "hkinv",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Invoice manager for freelance teachers in Hong Kong",
   "private": true,
   "type": "module",
@@ -10,7 +10,11 @@
     "preview": "vite preview",
     "lint": "eslint --ext .ts,.tsx .",
     "test:unit": "vitest run",
-    "test:unit:watch": "vitest"
+    "test:unit:watch": "vitest",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:desktop": "npx playwright test --project=desktop-chromium",
+    "test:e2e:mobile": "npx playwright test --project=mobile-chromium --project=tablet-chromium"
   },
   "keywords": [],
   "author": {
@@ -19,6 +23,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
