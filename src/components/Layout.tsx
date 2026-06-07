@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   AppBar,
   Box,
@@ -20,26 +20,32 @@ import {
   Tooltip,
   Snackbar,
   Alert,
-} from '@mui/material';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import PeopleIcon from '@mui/icons-material/People';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import SettingsIcon from '@mui/icons-material/Settings';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import MenuIcon from '@mui/icons-material/Menu';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import BackupIcon from '@mui/icons-material/Backup';
-import SaveIcon from '@mui/icons-material/Save';
-import CloudIcon from '@mui/icons-material/Cloud';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import { useAppContext } from '../contexts/AppContext';
-import { useInstallPrompt } from '../hooks/useInstallPrompt';
-import { useUpdateCheck } from '../hooks/useUpdateCheck';
-import { changeLanguage } from '../i18n/index';
-import { isBackupConfigured, getBackupFileName, getLastBackupTime, triggerBackup } from '../database/backup';
-import { configureBackupLocation } from '../database/fsa';
+} from "@mui/material";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import PeopleIcon from "@mui/icons-material/People";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import SettingsIcon from "@mui/icons-material/Settings";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import MenuIcon from "@mui/icons-material/Menu";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import BackupIcon from "@mui/icons-material/Backup";
+import SaveIcon from "@mui/icons-material/Save";
+import CloudIcon from "@mui/icons-material/Cloud";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import { useAppContext } from "../contexts/AppContext";
+import { useInstallPrompt } from "../hooks/useInstallPrompt";
+import { useUpdateCheck } from "../hooks/useUpdateCheck";
+import { changeLanguage } from "../i18n/index";
+import {
+  isBackupConfigured,
+  getBackupFileName,
+  getLastBackupTime,
+  triggerBackup,
+} from "../database/backup";
+import { configureBackupLocation } from "../database/fsa";
+import InstallHelpDialog from "./InstallHelpDialog";
 
 const DRAWER_WIDTH = 240;
 
@@ -54,11 +60,11 @@ function BackupIndicator() {
   const lastBackup = getLastBackupTime();
   const { state } = useAppContext();
 
-  const displayPath = fileName || state.dbPath || '';
+  const displayPath = fileName || state.dbPath || "";
 
   const title = configured
-    ? `${t('layout.backupEnabled')}${fileName ? ` (${fileName})` : ''}${lastBackup ? ` — ${lastBackup.toLocaleTimeString()}` : ''}`
-    : t('layout.backupNotConfigured');
+    ? `${t("layout.backupEnabled")}${fileName ? ` (${fileName})` : ""}${lastBackup ? ` — ${lastBackup.toLocaleTimeString()}` : ""}`
+    : t("layout.backupNotConfigured");
 
   const handleBackupNow = async () => {
     let result = await triggerBackup(true);
@@ -70,19 +76,23 @@ function BackupIndicator() {
     }
     if (!result) {
       try {
-        const { getDatabase } = await import('../database/connection');
+        const { getDatabase } = await import("../database/connection");
         const db = getDatabase();
         const data = new Uint8Array(db.export());
-        const blob = new Blob([data], { type: 'application/octet-stream' });
-        const { downloadBlob } = await import('../database/fsa');
-        const fName = getBackupFileName() || `hkinv-backup-${new Date().toISOString().split('T')[0]}.hkinv`;
+        const blob = new Blob([data], { type: "application/octet-stream" });
+        const { downloadBlob } = await import("../database/fsa");
+        const fName =
+          getBackupFileName() ||
+          `hkinv-backup-${new Date().toISOString().split("T")[0]}.hkinv`;
         downloadBlob(blob, fName);
-      } catch { /* Ignored: fallback save attempt */ }
+      } catch {
+        /* Ignored: fallback save attempt */
+      }
     }
   };
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
       {displayPath && (
         <Typography variant="caption" sx={{ opacity: 0.7, mr: 1 }} noWrap>
           {displayPath}
@@ -101,8 +111,13 @@ function BackupIndicator() {
           </IconButton>
         </Tooltip>
       )}
-      <Tooltip title={t('layout.saveToFile')}>
-        <IconButton size="small" color="inherit" onClick={handleBackupNow} sx={{ opacity: 0.7 }}>
+      <Tooltip title={t("layout.saveToFile")}>
+        <IconButton
+          size="small"
+          color="inherit"
+          onClick={handleBackupNow}
+          sx={{ opacity: 0.7 }}
+        >
           <SaveIcon fontSize="small" />
         </IconButton>
       </Tooltip>
@@ -116,35 +131,69 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const { state, setLanguage, toggleDarkMode } = useAppContext();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [backupToast, setBackupToast] = React.useState<{ open: boolean; message: string; severity: 'success' | 'info' | 'error' }>({ open: false, message: '', severity: 'success' });
+  const [backupToast, setBackupToast] = React.useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "info" | "error";
+  }>({ open: false, message: "", severity: "success" });
   const { installable, install } = useInstallPrompt();
   const { updateReady, update: applyUpdate } = useUpdateCheck();
+  const [installHelpOpen, setInstallHelpOpen] = React.useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { success: boolean; manual: boolean };
+      const detail = (e as CustomEvent).detail as {
+        success: boolean;
+        manual: boolean;
+      };
       if (detail.success) {
-        const label = detail.manual ? t('layout.saved') : t('layout.autoBackupDone');
-        setBackupToast({ open: true, message: label + ' ✓', severity: 'success' });
+        const label = detail.manual
+          ? t("layout.saved")
+          : t("layout.autoBackupDone");
+        setBackupToast({
+          open: true,
+          message: label + " ✓",
+          severity: "success",
+        });
       } else if (detail.manual) {
-        setBackupToast({ open: true, message: t('layout.backupNotConfigured'), severity: 'info' });
+        setBackupToast({
+          open: true,
+          message: t("layout.backupNotConfigured"),
+          severity: "info",
+        });
       }
     };
-    window.addEventListener('hkinv:backup', handler);
-    return () => window.removeEventListener('hkinv:backup', handler);
+    window.addEventListener("hkinv:backup", handler);
+    return () => window.removeEventListener("hkinv:backup", handler);
   }, [t]);
+  useEffect(() => {
+    const handler = () => setInstallHelpOpen(true);
+    window.addEventListener("hkinv:show-install-help", handler);
+    return () => window.removeEventListener("hkinv:show-install-help", handler);
+  }, []);
 
   const menuItems = [
-    { text: t('nav.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
-    { text: t('nav.invoices'), icon: <ReceiptLongIcon />, path: '/invoices' },
-    { text: t('nav.customers'), icon: <PeopleIcon />, path: '/customers' },
-    { text: t('nav.serviceTypes'), icon: <LocalOfferIcon />, path: '/service-types' },
-    { text: t('nav.taxReports'), icon: <AssessmentIcon />, path: '/tax-reports' },
-    { text: t('nav.cloudBackup'), icon: <CloudIcon />, path: '/cloud-backup' },
-    { text: t('nav.settings'), icon: <SettingsIcon />, path: '/settings' },
+    { text: t("nav.dashboard"), icon: <DashboardIcon />, path: "/dashboard" },
+    { text: t("nav.invoices"), icon: <ReceiptLongIcon />, path: "/invoices" },
+    { text: t("nav.customers"), icon: <PeopleIcon />, path: "/customers" },
+    {
+      text: t("nav.serviceTypes"),
+      icon: <LocalOfferIcon />,
+      path: "/service-types",
+    },
+    {
+      text: t("nav.taxReports"),
+      icon: <AssessmentIcon />,
+      path: "/tax-reports",
+    },
+    { text: t("nav.cloudBackup"), icon: <CloudIcon />, path: "/cloud-backup" },
+    { text: t("nav.settings"), icon: <SettingsIcon />, path: "/settings" },
   ];
 
-  const handleLangChange = (_: React.MouseEvent<HTMLElement>, newLang: string | null) => {
+  const handleLangChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newLang: string | null,
+  ) => {
     if (newLang) {
       changeLanguage(newLang);
       setLanguage(newLang);
@@ -160,7 +209,7 @@ export default function Layout({ children }: LayoutProps) {
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map(item => (
+        {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton
               selected={location.pathname.startsWith(item.path)}
@@ -176,7 +225,7 @@ export default function Layout({ children }: LayoutProps) {
         ))}
       </List>
       <Divider />
-      <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <ToggleButtonGroup
           value={i18n.language}
           exclusive
@@ -187,13 +236,22 @@ export default function Layout({ children }: LayoutProps) {
           <ToggleButton value="en">EN</ToggleButton>
         </ToggleButtonGroup>
       </Box>
-      <Box sx={{ p: '0 16px 16px', display: 'flex', justifyContent: 'center' }}>
-        <IconButton onClick={toggleDarkMode} size="small" color="inherit" aria-label={t('settings.darkMode')}>
-          {state.isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+      <Box sx={{ p: "0 16px 16px", display: "flex", justifyContent: "center" }}>
+        <IconButton
+          onClick={toggleDarkMode}
+          size="small"
+          color="inherit"
+          aria-label={t("settings.darkMode")}
+        >
+          {state.isDarkMode ? (
+            <LightModeIcon fontSize="small" />
+          ) : (
+            <DarkModeIcon fontSize="small" />
+          )}
         </IconButton>
       </Box>
       {installable && (
-        <Box sx={{ px: 2, pb: 1, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ px: 2, pb: 1, display: "flex", justifyContent: "center" }}>
           <Button
             variant="outlined"
             size="small"
@@ -201,11 +259,11 @@ export default function Layout({ children }: LayoutProps) {
             onClick={install}
             fullWidth
           >
-            {t('welcome.installApp') || 'Install App'}
+            {t("welcome.installApp") || "Install App"}
           </Button>
         </Box>
       )}
-      <Box sx={{ px: 2, pb: 2, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ px: 2, pb: 2, display: "flex", justifyContent: "center" }}>
         <Typography variant="caption" color="text.disabled">
           {__APP_VERSION__}
         </Typography>
@@ -214,12 +272,18 @@ export default function Layout({ children }: LayoutProps) {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Box component="a" href="#main-content" sx={{
-        position: 'absolute', left: -9999, zIndex: 9999,
-        '&:focus': { left: 16, top: 80, bgcolor: 'background.paper', p: 1 },
-      }}>
-        {t('common.skipToContent') || 'Skip to content'}
+    <Box sx={{ display: "flex" }}>
+      <Box
+        component="a"
+        href="#main-content"
+        sx={{
+          position: "absolute",
+          left: -9999,
+          zIndex: 9999,
+          "&:focus": { left: 16, top: 80, bgcolor: "background.paper", p: 1 },
+        }}
+      >
+        {t("common.skipToContent") || "Skip to content"}
       </Box>
 
       <AppBar
@@ -234,12 +298,12 @@ export default function Layout({ children }: LayoutProps) {
             color="inherit"
             edge="start"
             onClick={() => setMobileOpen(!mobileOpen)}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { sm: "none" } }}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            {t('app.title')}
+            {t("app.title")}
           </Typography>
           {state.isDbOpen && <BackupIndicator />}
         </Toolbar>
@@ -254,8 +318,11 @@ export default function Layout({ children }: LayoutProps) {
           open={mobileOpen}
           onClose={() => setMobileOpen(false)}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH },
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: DRAWER_WIDTH,
+            },
           }}
         >
           {drawer}
@@ -263,8 +330,11 @@ export default function Layout({ children }: LayoutProps) {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH },
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: DRAWER_WIDTH,
+            },
           }}
           open
         >
@@ -288,17 +358,21 @@ export default function Layout({ children }: LayoutProps) {
       <Snackbar
         open={backupToast.open}
         autoHideDuration={3000}
-        onClose={() => setBackupToast(t => ({ ...t, open: false }))}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        onClose={() => setBackupToast((t) => ({ ...t, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert severity={backupToast.severity} variant="filled" sx={{ minWidth: 200 }}>
+        <Alert
+          severity={backupToast.severity}
+          variant="filled"
+          sx={{ minWidth: 200 }}
+        >
           {backupToast.message}
         </Alert>
       </Snackbar>
 
       <Snackbar
         open={updateReady}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         sx={{ bottom: 60 }}
       >
         <Alert
@@ -306,13 +380,18 @@ export default function Layout({ children }: LayoutProps) {
           variant="filled"
           action={
             <Button color="inherit" size="small" onClick={applyUpdate}>
-              {t('common.updateNow') || 'Update'}
+              {t("common.updateNow") || "Update"}
             </Button>
           }
         >
-          {t('common.updateAvailable') || 'A new version is available. Click Update to refresh.'}
+          {t("common.updateAvailable") ||
+            "A new version is available. Click Update to refresh."}
         </Alert>
       </Snackbar>
+      <InstallHelpDialog
+        open={installHelpOpen}
+        onClose={() => setInstallHelpOpen(false)}
+      />
     </Box>
   );
 }
